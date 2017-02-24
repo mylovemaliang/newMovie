@@ -1,110 +1,54 @@
 package cn.fuyoushuo.vipmovie.view.activity;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.ViewTreeObserver;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.os.Handler;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 
-import com.zhy.android.percent.support.PercentRelativeLayout;
-
-import butterknife.Bind;
-import butterknife.ButterKnife;
 import cn.fuyoushuo.vipmovie.R;
-import cn.fuyoushuo.vipmovie.view.layout.MyScrollingView;
-import retrofit2.http.HEAD;
+import cn.fuyoushuo.vipmovie.view.flagment.TabFragment;
 
-public class MainActivity extends AppCompatActivity implements MyScrollingView.ScrollingChangedListener{
+public class MainActivity extends BaseActivity{
 
 
-    @Bind(R.id.scrollView)
-    MyScrollingView myScrollingView;
+    FragmentManager fragmentManager;
 
-    @Bind(R.id.topImage)
-    ImageView topImageView;
+    Fragment mContent;
 
-    @Bind(R.id.title)
-    TextView title;
-
-    @Bind(R.id.top)
-    TextView top;
-
-    @Bind(R.id.title_container)
-    PercentRelativeLayout titleContainer;
-
-    @Bind(R.id.top_container)
-    LinearLayout topContainer;
-
-    @Bind(R.id.title_ess_container)
-    PercentRelativeLayout titleEssContainer;
-
-    @Bind(R.id.top_ess_container)
-    LinearLayout topEssContainer;
-
-    private float titleAreaHeight;
-
-    private float topAreaHeight;
+    Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        myScrollingView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-               titleAreaHeight = titleContainer.getTop();
-               topAreaHeight = topContainer.getTop() - titleContainer.getHeight();
-               myScrollingView.setScrollingChangedListener(MainActivity.this);
+        fragmentManager = getSupportFragmentManager();
+        initFragment();
+    }
+
+    private void initFragment(){
+
+        final TabFragment tabFragment1 = TabFragment.newInstance();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.fragment_area,tabFragment1,"tab_fragment_1").show(tabFragment1);
+        mContent = tabFragment1;
+        fragmentTransaction.commitAllowingStateLoss();
+        fragmentManager.executePendingTransactions();
+    }
+
+    //转换flagment
+    public void switchContent(Fragment from,Fragment to){
+        if (mContent != to) {
+            mContent = to;
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.addToBackStack(null);
+            if (!to.isAdded()) {    // 先判断是否被add过
+                transaction.hide(from).add(R.id.fragment_area, to).commitAllowingStateLoss(); // 隐藏当前的fragment，add下一个到Activity中
+            } else {
+                transaction.hide(from).show(to).commitAllowingStateLoss(); // 隐藏当前的fragment，显示下一个
             }
-        });
+            fragmentManager.executePendingTransactions();
+        }
     }
 
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ButterKnife.unbind(this);
-    }
-
-    @Override
-    public void onScroll(int oldy, int dy, boolean isCloseTop) {
-         if(!isCloseTop && dy < titleAreaHeight){
-             HeaderTranslate(dy);
-         }
-         if(!isCloseTop && dy > titleAreaHeight){
-               HeaderTranslate(titleAreaHeight);
-               if(title.getParent() == titleContainer ){
-                 titleContainer.removeView(title);
-                 titleEssContainer.addView(title);
-                 titleEssContainer.setBackgroundColor(getResources().getColor(R.color.module_15));
-               }
-             if(dy > topAreaHeight){
-               if(top.getParent() == topContainer){
-                  topContainer.removeView(top);
-                  topEssContainer.addView(top);
-               }
-             }
-         }
-         else if(isCloseTop && dy < topAreaHeight){
-             if(top.getParent() == topEssContainer){
-                 topEssContainer.removeView(top);
-                 topContainer.addView(top);
-             }
-             if(dy < titleAreaHeight){
-                 HeaderTranslate(dy);
-                 if(title.getParent() == titleEssContainer){
-                     titleEssContainer.removeView(title);
-                     titleEssContainer.setBackgroundColor(getResources().getColor(R.color.transparent));
-                     titleContainer.addView(title);
-                 }
-             }
-     }
-   }
-
-    private void HeaderTranslate(float distance) {
-        topImageView.setTranslationY(-distance);
-        topImageView.setTranslationY(distance/2);
-    }
 }

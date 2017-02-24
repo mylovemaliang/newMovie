@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.v4.widget.NestedScrollView
+                android:id="@+id/scrollView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="fitXY"
+                            android:src="@mipmap/jxsc_head"
+                            android:id="@+id/topImage"/>
+
+                        <com.zhy.android.percent.support.PercentRelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="60dp"
+                            android:background="@color/zxing_transparent"
+                            android:id="@+id/title_container"
+                            android:layout_alignParentBottom="true">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_widthPercent="75%w"
+                                app:layout_heightPercent="65%h"
+                                android:background="@drawable/textborder"
+                                android:textSize="20sp"
+                                android:id="@+id/title"
+                                android:layout_centerInParent="true"/>
+
+                        </com.zhy.android.percent.support.PercentRelativeLayout>
+
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:background="@color/detailJe"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:id="@+id/top_container">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="置顶层"
+                            android:textSize="20sp"
+                            android:gravity="center"
+                            android:id="@+id/top"
+                            android:background="@color/module_7" />
+                    </LinearLayout>
+
+                     <android.support.v7.widget.RecyclerView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/main_bottomRcycleView">
+                    </android.support.v7.widget.RecyclerView>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:id="@+id/loading_footer"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="正在加载中..."
+                            android:textSize="15sp"
+                            android:layout_centerInParent="true" />
+
+                    </RelativeLayout>
+                </LinearLayout>
+         </android.support.v4.widget.NestedScrollView>
+
+
+     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.zhy.android.percent.support.PercentRelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:id="@+id/title_ess_container"/>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:id="@+id/top_ess_container"
+                android:orientation="vertical" />
+        </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/tab_fragment_area"
+        android:orientation="vertical"
+        android:layout_weight="1.0"
+        android:layout_above="@+id/tab_fragment_bottom" />
+
+    <com.zhy.android.percent.support.PercentLinearLayout
+        android:id="@+id/tab_fragment_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/module_13"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_widthPercent="20%w"
+            android:background="@drawable/click_ripple"
+            android:clickable="true">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/back"
+                android:layout_centerInParent="true" />
+
+         </RelativeLayout>
+
+         <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_widthPercent="20%w"
+            android:background="@drawable/click_ripple"
+            android:clickable="true">
+
+             <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/right"
+                android:layout_centerInParent="true" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_widthPercent="20%w"
+            android:background="@drawable/click_ripple"
+            android:clickable="true">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/more"
+                android:layout_centerInParent="true" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_widthPercent="20%w"
+            android:background="@drawable/click_ripple"
+            android:clickable="true">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/home"
+                android:layout_centerInParent="true" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_widthPercent="20%w"
+            android:background="@drawable/click_ripple"
+            android:clickable="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textSize="16sp"
+                android:background="@drawable/tabcountborder"
+                android:layout_centerInParent="true" />
+
+        </RelativeLayout>
+
+    </com.zhy.android.percent.support.PercentLinearLayout>
+
+
+
+
+
+</RelativeLayout>
