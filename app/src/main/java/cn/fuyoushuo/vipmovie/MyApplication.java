@@ -13,8 +13,11 @@ import com.facebook.common.memory.MemoryTrimmable;
 import com.facebook.common.memory.MemoryTrimmableRegistry;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.facebook.imagepipeline.producers.LocalFetchProducer;
 
 import java.util.Stack;
+
+import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
 
 /**
  * Created by QA on 2016/6/27.
@@ -54,6 +57,7 @@ public class MyApplication extends Application{
             }
         }).build();
         Fresco.initialize(context,config);
+        LocalFragmentManger.getIntance().initContext(context);
         //初始化异常拦截器
         //CrashHandler.getInstance().init(this);
         //用户登录信息管理

@@ -7,6 +7,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 import cn.fuyoushuo.vipmovie.R;
+import cn.fuyoushuo.vipmovie.ext.FragmentTagGenerator;
+import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
 import cn.fuyoushuo.vipmovie.view.flagment.TabFragment;
 
 public class MainActivity extends BaseActivity{
@@ -27,11 +29,15 @@ public class MainActivity extends BaseActivity{
     }
 
     private void initFragment(){
+        //初始化状态
+        String fragmentTag = FragmentTagGenerator.getFragmentTag();
+        Integer fragmentId = LocalFragmentManger.getIntance().addFragment(fragmentTag);
+        TabFragment tabFragment = TabFragment.newInstance(fragmentId);
 
-        final TabFragment tabFragment1 = TabFragment.newInstance();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.fragment_area,tabFragment1,"tab_fragment_1").show(tabFragment1);
-        mContent = tabFragment1;
+        fragmentTransaction.add(R.id.fragment_area,tabFragment,fragmentTag).show(tabFragment);
+
+        mContent = tabFragment;
         fragmentTransaction.commitAllowingStateLoss();
         fragmentManager.executePendingTransactions();
     }
