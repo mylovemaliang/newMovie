@@ -3,27 +3,47 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#303030"
+    >
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_widthPercent="100%w"
-        app:layout_heightPercent="70%h"
-        app:layout_marginTopPercent="10%h"
-        android:background="@color/cardview_shadow_start_color"
-        >
+        app:layout_heightPercent="65%h"
+        app:layout_marginTopPercent="20%h"
+        android:id="@+id/tab_recycleview">
 
     </android.support.v7.widget.RecyclerView>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_heightPercent="10%h"
-        android:background="@color/detailJe"
+        app:layout_heightPercent="8%h"
+        android:background="#80666666"
         android:layout_alignParentBottom="true">
-    </RelativeLayout>
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/add"
+        android:id="@+id/addTab"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:layout_centerInParent="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/right"
+        android:id="@+id/backto"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:layout_alignTop="@+id/addTab"
+        android:layout_alignParentRight="true" />
+
+    </RelativeLayout>
 
 
 </com.zhy.android.percent.support.PercentRelativeLayout>

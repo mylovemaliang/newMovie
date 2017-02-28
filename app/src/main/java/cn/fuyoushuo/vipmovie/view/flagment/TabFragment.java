@@ -1,8 +1,11 @@
 package cn.fuyoushuo.vipmovie.view.flagment;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.animation.AnimatorCompatHelper;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 
@@ -13,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import cn.fuyoushuo.vipmovie.R;
+import cn.fuyoushuo.vipmovie.presenter.impl.TabPresenter;
 import rx.functions.Action1;
 
 /**
@@ -25,6 +29,8 @@ public class TabFragment extends BaseFragment{
     RelativeLayout tabCountArea;
 
     private Integer fragmentId;
+
+    TabPresenter tabPresenter;
 
     public Integer getFragmentId() {
         return fragmentId;
@@ -52,6 +58,14 @@ public class TabFragment extends BaseFragment{
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        if(getArguments() != null){
+            this.fragmentId = getArguments().getInt("fragmentId",0);
+        }
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     protected void initView() {
         super.initView();
         MainFragment mainFragment = MainFragment.newInstance();
@@ -69,16 +83,32 @@ public class TabFragment extends BaseFragment{
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
+                       tabPresenter.captureScreen(fragmentId, new TabPresenter.CaptureCallback() {
+                           @Override
+                           public void onSuccess() {
+                                Log.d("capture callback","success");
+                                SwipeDialogFragment.newInstance().show(getFragmentManager(),"swipeDialogFragment");
+                           }
 
+                           @Override
+                           public void onError() {
+                                Log.d("capture callback","error");
+                           }
+                       });
                     }
                 });
 
     }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        tabPresenter = new TabPresenter(activity);
+    }
+
     public static TabFragment newInstance(Integer fragmentId) {
         Bundle args = new Bundle();
         TabFragment fragment = new TabFragment();
-        fragment.setFragmentId(fragmentId);
         args.putInt("fragmentId",fragmentId);
         fragment.setArguments(args);
         return fragment;

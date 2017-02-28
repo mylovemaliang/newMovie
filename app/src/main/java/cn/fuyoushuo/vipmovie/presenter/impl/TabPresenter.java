@@ -8,10 +8,13 @@ import android.view.View;
 
 import java.lang.ref.WeakReference;
 
+import cn.fuyoushuo.vipmovie.ext.BitmapManger;
 import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
 import cn.fuyoushuo.vipmovie.ext.Pair;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by QA on 2017/2/27.
@@ -30,9 +33,46 @@ public class TabPresenter extends BasePresenter{
         return context.get();
     }
 
-    public  void captureScreen(Integer fragmentId){
-        Pair fragment = LocalFragmentManger.getIntance().getFragment(fragmentId);
-        if(getContext() == null || fragment == null) return;
+    //截图
+    public  void captureScreen(final Integer fragmentId, final CaptureCallback captureCallback){
+        Pair currentPair = LocalFragmentManger.getIntance().getFragment(fragmentId);
+        if(getContext() == null || currentPair == null) return;
+        mSubscriptions.add(createBitmapObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Bitmap>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                       if(captureCallback != null){
+                           captureCallback.onError();
+                       }
+                    }
+
+                    @Override
+                    public void onNext(Bitmap bitmap) {
+                        //保存bitmap
+                        BitmapManger.getIntance().putBitmap(fragmentId,bitmap);
+                        if(captureCallback != null){
+                            captureCallback.onSuccess();
+                        }
+                    }
+                })
+        );
+
+    }
+
+
+    public interface CaptureCallback{
+
+         void onSuccess();
+
+         void onError();
+
     }
 
 

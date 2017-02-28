@@ -4,6 +4,7 @@
     android:layout_width="280dp"
     android:layout_height="match_parent"
     app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/white"
     app:layout_collapseParallaxMultiplier="1.0">
 
     <com.zhy.android.percent.support.PercentLinearLayout
@@ -14,14 +15,38 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_heightPercent="10%h"
+            app:layout_heightPercent="8%h"
             android:background="@color/cardview_shadow_start_color">
+
+            <TextView
+                android:id="@+id/tab_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="###"
+                android:textSize="15sp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="5dp" />
+
+
+            <ImageView
+                android:id="@+id/close_tab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/close"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:paddingRight="5dp"
+                android:paddingLeft="5dp" />
+
         </RelativeLayout>
 
-        <com.facebook.drawee.view.SimpleDraweeView
+        <ImageView
+           android:id="@+id/tab_item_image"
            android:layout_width="match_parent"
            android:layout_height="0dp"
-           app:layout_heightPercent="90%h"/>
+           app:layout_heightPercent="92%h"
+           android:scaleType="fitXY"/>
 
     </com.zhy.android.percent.support.PercentLinearLayout>
 
