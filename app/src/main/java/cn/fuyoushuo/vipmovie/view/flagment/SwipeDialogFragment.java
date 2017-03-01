@@ -74,9 +74,13 @@ public class SwipeDialogFragment extends RxDialogFragment {
         recyclerView.addItemDecoration(new TabItemDecoration());
         tabDataAdapter.setItemActionListener(new TabDataAdapter.ItemActionListener() {
             @Override
-            public void onItemRemove(TabItem tabItem) {
+            public void onItemRemove(TabItem tabItem,boolean isOnlyOne) {
                 //item删除触发事件
-                RxBus.getInstance().send(new deleteTabEvent(tabItem));
+                if(isOnlyOne){
+                    dismissAllowingStateLoss();
+                }else{
+                    RxBus.getInstance().send(new deleteTabEvent(tabItem));
+                }
             }
 
             @Override

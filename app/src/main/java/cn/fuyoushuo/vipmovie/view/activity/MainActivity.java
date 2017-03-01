@@ -2,6 +2,7 @@ package cn.fuyoushuo.vipmovie.view.activity;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -10,6 +11,7 @@ import android.text.TextUtils;
 import cn.fuyoushuo.commonlib.utils.RxBus;
 import cn.fuyoushuo.domain.entity.TabItem;
 import cn.fuyoushuo.vipmovie.R;
+import cn.fuyoushuo.vipmovie.ext.BitmapManger;
 import cn.fuyoushuo.vipmovie.ext.FragmentTagGenerator;
 import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
 import cn.fuyoushuo.vipmovie.view.flagment.SwipeDialogFragment;
@@ -76,6 +78,8 @@ public class MainActivity extends BaseActivity{
                      switchContent(mContent,tabFragment,fragmentTag);
                  }
                  else if(busEvent instanceof SwipeDialogFragment.deleteTabEvent){
+                     SwipeDialogFragment.deleteTabEvent event = (SwipeDialogFragment.deleteTabEvent) busEvent;
+                     deleteTab(event.getTabItem());
 
                  }
                  else if(busEvent instanceof SwipeDialogFragment.clickTabEvent){
@@ -86,16 +90,40 @@ public class MainActivity extends BaseActivity{
         }));
     }
 
+    //点击tab
     public void clickTab(TabItem tabItem){
-       Integer fragmentId = tabItem.getFragmentId();
-       String fragmentTag = tabItem.getFragmentTag();
-       Fragment fragmentByTag = fragmentManager.findFragmentByTag(fragmentTag);
-       if(!(fragmentByTag == mContent)) {
+        Integer fragmentId = tabItem.getFragmentId();
+        String fragmentTag = tabItem.getFragmentTag();
+        Fragment fragmentByTag = fragmentManager.findFragmentByTag(fragmentTag);
+        if(!(fragmentByTag == mContent)) {
            LocalFragmentManger.getIntance().setCurrentId(fragmentId);
            switchContent(mContent,fragmentByTag,"");
-       }else{
+        }else{
            return;
-       }
+        }
+    }
+
+    //删除tab
+    public void deleteTab(TabItem tabItem){
+        Integer fragmentId = tabItem.getFragmentId();
+        String fragmentTag = tabItem.getFragmentTag();
+        Fragment deleteFragment = fragmentManager.findFragmentByTag(fragmentTag);
+        //开始删除元素
+        LocalFragmentManger.getIntance().removeFragment(fragmentId);
+        BitmapManger.getIntance().removeBitmap(fragmentId);
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        if(deleteFragment == mContent){
+            TabItem firstFragment = LocalFragmentManger.getIntance().getFirstFragment();
+            String headFragmentTag = firstFragment.getFragmentTag();
+            Fragment headFragmentByTag = fragmentManager.findFragmentByTag(headFragmentTag);
+            switchContent(mContent,headFragmentByTag,"");
+            LocalFragmentManger.getIntance().setCurrentId(firstFragment.getFragmentId());
+            fragmentTransaction.remove(deleteFragment);
+        }else{
+            fragmentTransaction.remove(deleteFragment);
+        }
+        fragmentTransaction.commitAllowingStateLoss();
+        fragmentManager.executePendingTransactions();
     }
 
 

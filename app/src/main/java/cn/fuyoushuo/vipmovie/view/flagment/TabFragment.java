@@ -2,7 +2,6 @@ package cn.fuyoushuo.vipmovie.view.flagment;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.animation.AnimatorCompatHelper;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -87,7 +86,8 @@ public class TabFragment extends BaseFragment{
                            @Override
                            public void onSuccess() {
                                 Log.d("capture callback","success");
-                                SwipeDialogFragment.newInstance().show(getFragmentManager(),"swipeDialogFragment");
+                                SwipeDialogFragment swipeDialogFragment = SwipeDialogFragment.newInstance();
+                                swipeDialogFragment.show(getFragmentManager(),"swipeDialogFragment");
                            }
 
                            @Override

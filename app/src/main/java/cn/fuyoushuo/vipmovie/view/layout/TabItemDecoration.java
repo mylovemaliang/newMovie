@@ -14,11 +14,12 @@ public class TabItemDecoration extends RecyclerView.ItemDecoration {
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         //由于每行都只有3个，所以第一个都是3的倍数，把左边距设为0
         if (parent.getChildLayoutPosition(view) == 0) {
-            outRect.left = 10;
-            outRect.right =20;
+            outRect.left = 20;
+            outRect.right = 20;
         }else{
             outRect.left = 20;
             outRect.right = 20;
         }
+        outRect.top = 200;
     }
 }

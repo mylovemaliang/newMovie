@@ -8,6 +8,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class LocalFragmentManger {
 
     private Integer currentId = 0;
 
-    private LinkedHashMap<Integer,Pair> fragmentMap = new LinkedHashMap<>();
+    private LinkedHashMap<Integer,Pair> fragmentMap = new LinkedHashMap<Integer, Pair>();
 
     /**
      * 添加fragment,首次添加fragment肯定为首页
@@ -84,9 +85,31 @@ public class LocalFragmentManger {
         return fragmentMap.get(id);
     }
 
+    //获取map里存在的第一个fragment元素
+    public TabItem getFirstFragment(){
+        Set<Map.Entry<Integer, Pair>> entries = fragmentMap.entrySet();
+        TabItem resultItem = new TabItem();
+        if(entries.isEmpty()) return resultItem;
+        Iterator<Map.Entry<Integer, Pair>> iterator = entries.iterator();
+        while (iterator.hasNext()){
+            Map.Entry<Integer, Pair> next = iterator.next();
+            Integer id = next.getKey();
+            Pair value = next.getValue();
+            String title = value.getTitle();
+            String fragmentTag = value.getFragmentTag();
+            resultItem = new TabItem(id,fragmentTag,title);
+            break;
+        }
+        return resultItem;
+    }
+
     //指定当前正在显示的ID
     public void setCurrentId(Integer currentId){
         this.currentId = currentId;
+    }
+
+    public Integer getCurrentId() {
+        return currentId;
     }
 
     //获取当前正在显示的视图数量
