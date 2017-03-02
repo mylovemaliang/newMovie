@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import cn.fuyoushuo.commonlib.utils.Constants;
 import cn.fuyoushuo.domain.httpservice.FqbbHttpService;
+import cn.fuyoushuo.domain.httpservice.NewsHttpService;
 import okhttp3.Cache;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -95,6 +96,9 @@ public class ServiceManager {
         String endPoint = "";
         if (t.getName().equals(FqbbHttpService.class.getName())) {
             endPoint = Constants.ENDPOINT_FQBB;
+        }
+        if(t.getName().equals(NewsHttpService.class.getName())){
+            endPoint = Constants.ENDPOINT_NEWS;
         }
         if ("".equals(endPoint)) {
             throw new IllegalArgumentException("Error: Can't get end point url. Please configure at the method " + ServiceManager.class.getSimpleName() + ".getEndPoint(T t)");

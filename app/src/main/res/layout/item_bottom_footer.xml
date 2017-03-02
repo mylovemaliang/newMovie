@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="45dp"
+    android:background="@color/module_18">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_centerInParent="true">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/load_more"
+            android:layout_centerVertical="true"
+            android:id="@+id/load_more_image"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="点击加载更多"
+            android:textSize="14sp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/load_more_image"
+            android:layout_marginLeft="2dp"/>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

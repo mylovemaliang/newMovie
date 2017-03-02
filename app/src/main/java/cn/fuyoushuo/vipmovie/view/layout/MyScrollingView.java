@@ -1,72 +1,52 @@
 package cn.fuyoushuo.vipmovie.view.layout;
 
 import android.content.Context;
+import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.ViewConfiguration;
 import android.widget.ScrollView;
 
 /**
  * Created by QA on 2017/2/21.
  */
 
-public class MyScrollingView extends ScrollView {
+public class MyScrollingView extends NestedScrollView {
 
-    private ScrollingChangedListener scrollingChangedListener;
-
-    public void setScrollingChangedListener(ScrollingChangedListener scrollingChangedListener) {
-        this.scrollingChangedListener = scrollingChangedListener;
-    }
+    private int downX;
+    private int downY;
+    private int mTouchSlop;
 
     public MyScrollingView(Context context) {
         super(context);
+        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
     }
 
     public MyScrollingView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
     }
 
     public MyScrollingView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
     }
 
     @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return super.onInterceptTouchEvent(ev);
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        return super.dispatchTouchEvent(ev);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        return super.onTouchEvent(ev);
-    }
-
-    @Override
-    protected void onScrollChanged(int l, int y, int oldl, int oldy) {
-        super.onScrollChanged(l, y, oldl, oldy);
-        if(scrollingChangedListener != null){
-            //手指上滑
-            if(oldy < y){
-               scrollingChangedListener.onScroll(oldy,y,false);
-            }else if(oldy > y){
-               scrollingChangedListener.onScroll(oldy,y,true);
-            }
+    public boolean onInterceptTouchEvent(MotionEvent e) {
+        int action = e.getAction();
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                downX = (int) e.getRawX();
+                downY = (int) e.getRawY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                int moveY = (int) e.getRawY();
+                if (Math.abs(moveY - downY) > mTouchSlop) {
+                    return true;
+                }
         }
-    }
-
-    public interface ScrollingChangedListener{
-
-        /**
-         * 当滑动的时候,进行监听
-         * @param oldy 上次滑动的y坐标
-         * @param dy   此次滑动的y坐标
-         * @param isCloseTop  是否接近顶部
-         */
-        void onScroll(int oldy, int dy, boolean isCloseTop);
-
+        return super.onInterceptTouchEvent(e);
     }
 
 

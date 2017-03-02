@@ -8,11 +8,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.jakewharton.rxbinding.view.RxView;
+
+import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cn.fuyoushuo.domain.entity.NewItem;
 import cn.fuyoushuo.vipmovie.R;
+import rx.functions.Action1;
 
 /**
  * 多类型新闻条目的实现
@@ -25,6 +29,24 @@ public class NewsAdapter extends BaseListAdapter<NewItem>{
 
     public static int ITEM_VIEW_TYPE_IMAGES_3 = 2;
 
+    public static int ITEM_VIEW_TYPE_FOOTER = 3;
+
+
+    private LoadListener loadListener;
+
+    private String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setLoadListener(LoadListener loadListener) {
+        this.loadListener = loadListener;
+    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -36,13 +58,30 @@ public class NewsAdapter extends BaseListAdapter<NewItem>{
              View view3 = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bottom_rview2, parent, false);
              return new ThreeImageViewHolder(view3);
          }
+         else if(viewType == ITEM_VIEW_TYPE_FOOTER){
+             View footer = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bottom_footer, parent, false);
+             return new FooterViewHolder(footer);
+         }
          return super.onCreateViewHolder(parent,viewType);
     }
 
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         int itemViewType = holder.getItemViewType();
+        if(itemViewType == ITEM_VIEW_TYPE_FOOTER){
+            RxView.clicks(holder.itemView).throttleFirst(1000, TimeUnit.MILLISECONDS)
+                    .subscribe(new Action1<Void>() {
+                        @Override
+                        public void call(Void aVoid) {
+                            NewItem newItem = mDataList.get(position - 1);
+                            if(loadListener != null){
+                                loadListener.onLoadMore(newItem);
+                            }
+                        }
+                    });
+            return;
+        }
         NewItem newItem = mDataList.get(position);
         if(itemViewType == ITEM_VIEW_TYPE_IMAGES_1){
             OneImageViewHolder holder1 = (OneImageViewHolder) holder;
@@ -66,6 +105,9 @@ public class NewsAdapter extends BaseListAdapter<NewItem>{
 
     @Override
     public int getItemViewType(int position) {
+        if(position == mDataList.size()){
+            return ITEM_VIEW_TYPE_FOOTER;
+        }
         NewItem newItem = mDataList.get(position);
         Integer imageSize = newItem.getImageSize();
         if(imageSize == 1){
@@ -75,6 +117,11 @@ public class NewsAdapter extends BaseListAdapter<NewItem>{
             return ITEM_VIEW_TYPE_IMAGES_3;
         }
         return super.getItemViewType(position);
+    }
+
+    @Override
+    public int getItemCount() {
+        return super.getItemCount() + 1;
     }
 
     public class OneImageViewHolder extends RecyclerView.ViewHolder {
@@ -116,6 +163,21 @@ public class NewsAdapter extends BaseListAdapter<NewItem>{
             ButterKnife.bind(this,itemView);
         }
     }
+
+    public class FooterViewHolder extends RecyclerView.ViewHolder{
+
+        public FooterViewHolder(View itemView) {
+            super(itemView);
+        }
+    }
+
+    public interface LoadListener{
+
+        void onLoadMore(NewItem lastNewItem);
+
+    }
+
+
 
 
 }

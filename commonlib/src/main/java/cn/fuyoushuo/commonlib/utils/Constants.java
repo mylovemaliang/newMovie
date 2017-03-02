@@ -22,15 +22,9 @@ public class Constants {
 
     public static final String ENDPOINT_FQBB = "http://www.fanqianbb.com";
 
-    public static final String ENDPOINT_TAOBAO_SEARCH="http://s.m.taobao.com";
+    public static final String ENDPOINT_NEWS="http://newswifiapi.dftoutiao.com";
 
-    public static final String ENDPOINT_ALIMAMA_SEARCH="http://pub.alimama.com";
 
-    public static final String ENDPOINT_JIFENBAO_SEARCH="http://ok.etao.com";
-
-    public static final String ENDPOINT_TAOBAO_SUGGESTS="https://suggest.taobao.com";
-
-    public static final String ENDPOINT_FQBB_LOCAL = "http://www.fanqianbb.com";
 
     //测试
     //public static final String ENDPOINT_FQBB_LOCAL = "http://testwww.fanqianbb.com";
@@ -40,7 +34,7 @@ public class Constants {
     public static final boolean DEBUG = false;
 
     //日志相关
-    public static final String BASE_FILE_PATH = "fanqianbb";
+    public static final String BASE_FILE_PATH = "vipmovie";
     public static final String LOG_PATH = BASE_FILE_PATH + File.separator + "log";
     public static final String LOG_FILE = BASE_FILE_PATH + ".log";
 }
