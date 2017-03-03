@@ -20,15 +20,19 @@ import butterknife.Bind;
 import cn.fuyoushuo.domain.entity.FGoodItem;
 import cn.fuyoushuo.domain.entity.NewItem;
 import cn.fuyoushuo.domain.entity.NewType;
+import cn.fuyoushuo.domain.entity.SiteItem;
 import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.R;
 import cn.fuyoushuo.vipmovie.presenter.impl.MainPresenter;
 import cn.fuyoushuo.vipmovie.view.adapter.FgoodDataAdapter;
 import cn.fuyoushuo.vipmovie.view.adapter.NewsAdapter;
+import cn.fuyoushuo.vipmovie.view.adapter.SiteItemAdapter;
 import cn.fuyoushuo.vipmovie.view.adapter.TypeDataAdapter;
 import cn.fuyoushuo.vipmovie.view.iview.IMainView;
+import cn.fuyoushuo.vipmovie.view.layout.MyGridLayoutManager;
 import cn.fuyoushuo.vipmovie.view.layout.MyScrollingView;
 import cn.fuyoushuo.vipmovie.view.layout.NewsItemDecoration;
+import cn.fuyoushuo.vipmovie.view.layout.SiteItemDecoration;
 import cn.fuyoushuo.vipmovie.view.layout.TypeItemsDecoration;
 
 /**
@@ -82,6 +86,11 @@ public class MainFragment extends BaseFragment implements IMainView{
 
     TypeDataAdapter typeDataAdapter;
 
+    @Bind(R.id.sites_area)
+    RecyclerView siteRview;
+
+    SiteItemAdapter siteItemAdapter;
+
     @Override
     protected String getPageName() {
         return "main_fragment_page";
@@ -127,7 +136,7 @@ public class MainFragment extends BaseFragment implements IMainView{
                     if (title.getParent() == titleContainer) {
                         titleContainer.removeView(title);
                         titleEssContainer.addView(title);
-                        titleEssContainer.setBackgroundColor(getResources().getColor(R.color.module_15));
+                        titleEssContainer.setBackgroundColor(getResources().getColor(R.color.module_19));
                     }
                     if (dy > topAreaHeight) {
                         if (top.getParent() == topContainer) {
@@ -240,6 +249,16 @@ public class MainFragment extends BaseFragment implements IMainView{
           myRecycleView.setLayoutManager(layoutManager);
           myRecycleView.setNestedScrollingEnabled(true);
           myRecycleView.setAdapter(newsAdapter);
+
+          siteItemAdapter = new SiteItemAdapter();
+          siteRview.setHasFixedSize(true);
+          final MyGridLayoutManager gridLayoutManager = new MyGridLayoutManager(mactivity,5);
+          gridLayoutManager.setAutoMeasureEnabled(true);
+          siteRview.addItemDecoration(new SiteItemDecoration());
+          siteRview.setLayoutManager(gridLayoutManager);
+          siteRview.setNestedScrollingEnabled(true);
+          siteRview.setAdapter(siteItemAdapter);
+
     }
 
     @Override
@@ -248,6 +267,7 @@ public class MainFragment extends BaseFragment implements IMainView{
         typeDataAdapter.notifyDataSetChanged();
         if(mainPresenter != null){
             mainPresenter.getNews("toutiao","",false);
+            mainPresenter.getHeadSites();
         }
     }
 
@@ -342,5 +362,15 @@ public class MainFragment extends BaseFragment implements IMainView{
         }else{
             Toast.makeText(MyApplication.getContext(),"网速不给力,请稍候",Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void setupHeadSites(List<SiteItem> siteItems, boolean isSucc) {
+         if(isSucc){
+              siteItemAdapter.setData(siteItems);
+              siteItemAdapter.notifyDataSetChanged();
+         }else {
+
+         }
     }
 }

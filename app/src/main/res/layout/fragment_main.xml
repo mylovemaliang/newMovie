@@ -17,13 +17,13 @@
 
                     <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="200dp">
+                        android:layout_height="160dp">
 
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="fitXY"
-                            android:src="@mipmap/jxsc_head"
+                            android:src="@mipmap/backgroud"
                             android:id="@+id/topImage"/>
 
                         <com.zhy.android.percent.support.PercentRelativeLayout
@@ -36,10 +36,12 @@
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_height="0dp"
-                                app:layout_widthPercent="75%w"
-                                app:layout_heightPercent="65%h"
+                                app:layout_widthPercent="80%w"
+                                app:layout_heightPercent="70%h"
                                 android:background="@drawable/textborder"
-                                android:textSize="20sp"
+                                android:text="搜索或输入网址"
+                                android:gravity="center"
+                                android:textSize="16sp"
                                 android:id="@+id/title"
                                 android:layout_centerInParent="true"/>
 
@@ -47,10 +49,11 @@
 
                     </RelativeLayout>
 
-                    <LinearLayout
+                    <android.support.v7.widget.RecyclerView
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:background="@color/detailJe"/>
+                        android:layout_height="180dp"
+                        android:id="@+id/sites_area"
+                        android:background="@color/white"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -60,14 +63,14 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:id="@+id/top"
-                            android:background="@color/module_15" />
+                            android:background="@color/module_19" />
                     </LinearLayout>
 
                      <android.support.v7.widget.RecyclerView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/main_bottomRcycleView"
-                        android:background="@color/module_18"
+                        android:background="@color/module_19"
                          >
                     </android.support.v7.widget.RecyclerView>
 

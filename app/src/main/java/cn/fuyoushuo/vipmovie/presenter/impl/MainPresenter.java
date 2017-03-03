@@ -1,11 +1,14 @@
 package cn.fuyoushuo.vipmovie.presenter.impl;
 
+import android.animation.FloatArrayEvaluator;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPObject;
+import com.github.lzyzsd.jsbridge.BridgeUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,12 +18,15 @@ import java.util.Map;
 import cn.fuyoushuo.domain.entity.FGoodItem;
 import cn.fuyoushuo.domain.entity.HttpResp;
 import cn.fuyoushuo.domain.entity.NewItem;
+import cn.fuyoushuo.domain.entity.SiteItem;
 import cn.fuyoushuo.domain.httpservice.FqbbHttpService;
 import cn.fuyoushuo.domain.httpservice.NewsHttpService;
 import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.ServiceManager;
 import cn.fuyoushuo.vipmovie.view.iview.IMainView;
 import rx.Observable;
+import rx.Observable.OnSubscribe;
+import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
@@ -128,6 +134,32 @@ public class MainPresenter extends BasePresenter {
          );
     }
 
+    /**
+     * 获取头部网站信息
+     */
+    public void getHeadSites(){
+        mSubscriptions.add(createSitesObserver()
+             .subscribeOn(Schedulers.io())
+             .observeOn(AndroidSchedulers.mainThread())
+             .subscribe(new Subscriber<List<SiteItem>>() {
+                 @Override
+                 public void onCompleted() {
+
+                 }
+
+                 @Override
+                 public void onError(Throwable e) {
+                    mainView.setupHeadSites(new ArrayList<SiteItem>(),false);
+                 }
+
+                 @Override
+                 public void onNext(List<SiteItem> siteItems) {
+                     mainView.setupHeadSites(siteItems,true);
+                 }
+             })
+        );
+    }
+
     //解析数组
     private List<NewItem> parseNewsArray(JSONArray array){
         List<NewItem> newItems = new ArrayList<NewItem>();
@@ -154,6 +186,22 @@ public class MainPresenter extends BasePresenter {
             newItems.add(item);
         }
         return newItems;
+    }
+
+
+    //获取首页图标信息
+    private Observable<List<SiteItem>> createSitesObserver(){
+        return Observable.create(new OnSubscribe<List<SiteItem>>() {
+            @Override
+            public void call(Subscriber<? super List<SiteItem>> subscriber) {
+                 List<SiteItem> siteItems = new ArrayList<SiteItem>();
+                 String sites = BridgeUtil.assetFile2Str(MyApplication.getContext(), "sites");
+                 siteItems = JSONObject.parseArray(sites, SiteItem.class);
+                 subscriber.onNext(siteItems);
+            }
+        });
+
+
     }
 
 

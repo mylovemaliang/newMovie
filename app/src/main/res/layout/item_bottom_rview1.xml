@@ -27,8 +27,9 @@
                 app:layout_widthPercent="100%w"
                 app:layout_heightPercent="70%h"
                 android:text="为什么说彪悍的俄罗斯人是“战斗民族“?"
-                android:textStyle="bold"
-                android:textSize="14sp"
+                android:textStyle="normal"
+                android:textSize="16sp"
+                android:typeface="serif"
                 android:gravity="center_vertical" />
 
             <TextView

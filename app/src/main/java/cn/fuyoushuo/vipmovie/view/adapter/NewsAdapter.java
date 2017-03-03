@@ -31,6 +31,8 @@ public class NewsAdapter extends BaseListAdapter<NewItem>{
 
     public static int ITEM_VIEW_TYPE_FOOTER = 3;
 
+    public static int ITEM_VIEW_NULL = 4;
+
 
     private LoadListener loadListener;
 
@@ -121,8 +123,13 @@ public class NewsAdapter extends BaseListAdapter<NewItem>{
 
     @Override
     public int getItemCount() {
-        return super.getItemCount() + 1;
+        if(mDataList.size() == 0){
+            return 0;
+        }else{
+            return super.getItemCount() + 1;
+        }
     }
+
 
     public class OneImageViewHolder extends RecyclerView.ViewHolder {
 

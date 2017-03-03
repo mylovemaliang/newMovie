@@ -17,7 +17,7 @@
         android:id="@+id/tab_fragment_bottom"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@color/module_13"
+        android:background="@color/module_19"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
