@@ -17,6 +17,7 @@ import com.zhy.android.percent.support.PercentRelativeLayout;
 import java.util.List;
 
 import butterknife.Bind;
+import cn.fuyoushuo.commonlib.utils.RxBus;
 import cn.fuyoushuo.domain.entity.FGoodItem;
 import cn.fuyoushuo.domain.entity.NewItem;
 import cn.fuyoushuo.domain.entity.NewType;
@@ -240,6 +241,11 @@ public class MainFragment extends BaseFragment implements IMainView{
                   String type = newsAdapter.getType();
                   mainPresenter.getNews(type,rowKey,true);
               }
+
+              @Override
+              public void onClickNews(NewItem newItem) {
+                   RxBus.getInstance().send(new toContentViewEvent(newItem));
+              }
           });
           myRecycleView.setHasFixedSize(true);
           LinearLayoutManager layoutManager = new LinearLayoutManager(mactivity);
@@ -373,4 +379,23 @@ public class MainFragment extends BaseFragment implements IMainView{
 
          }
     }
+
+
+  //-------------------------------------总线事件---------------------------------------------------------
+   public class toContentViewEvent extends RxBus.BusEvent{
+
+      private NewItem newItem;
+
+      public toContentViewEvent(NewItem newItem) {
+          this.newItem = newItem;
+      }
+
+      public NewItem getNewItem() {
+          return newItem;
+      }
+
+      public void setNewItem(NewItem newItem) {
+          this.newItem = newItem;
+      }
+   }
 }

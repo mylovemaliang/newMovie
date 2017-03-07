@@ -90,6 +90,16 @@ public class NewsAdapter extends BaseListAdapter<NewItem>{
             holder1.newTitle.setText(newItem.getTopic());
             holder1.newSource.setText(newItem.getSource());
             holder1.simpleDraweeView.setImageURI(Uri.parse(newItem.getImageUrls().get(0)));
+            RxView.clicks(holder1.itemView).throttleFirst(1000, TimeUnit.MILLISECONDS)
+                    .subscribe(new Action1<Void>() {
+                        @Override
+                        public void call(Void aVoid) {
+                            NewItem newItem = mDataList.get(position);
+                            if(loadListener != null){
+                                loadListener.onClickNews(newItem);
+                            }
+                        }
+                    });
         }
         else if(itemViewType == ITEM_VIEW_TYPE_IMAGES_3){
             ThreeImageViewHolder holder2 = (ThreeImageViewHolder) holder;
@@ -98,6 +108,16 @@ public class NewsAdapter extends BaseListAdapter<NewItem>{
             holder2.image1.setImageURI(Uri.parse(newItem.getImageUrls().get(0)));
             holder2.image2.setImageURI(Uri.parse(newItem.getImageUrls().get(1)));
             holder2.image3.setImageURI(Uri.parse(newItem.getImageUrls().get(2)));
+            RxView.clicks(holder2.itemView).throttleFirst(1000, TimeUnit.MILLISECONDS)
+                    .subscribe(new Action1<Void>() {
+                        @Override
+                        public void call(Void aVoid) {
+                            NewItem newItem = mDataList.get(position);
+                            if(loadListener != null){
+                                loadListener.onClickNews(newItem);
+                            }
+                        }
+                    });
         }
         else{
 
@@ -181,6 +201,8 @@ public class NewsAdapter extends BaseListAdapter<NewItem>{
     public interface LoadListener{
 
         void onLoadMore(NewItem lastNewItem);
+
+        void onClickNews(NewItem newItem);
 
     }
 

@@ -65,6 +65,20 @@ public class BaseActivity extends RxAppCompatActivity {
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+        {
+          //land
+        }
+        else if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        {
+          //port
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
     }

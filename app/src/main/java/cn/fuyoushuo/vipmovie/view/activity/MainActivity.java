@@ -7,9 +7,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.fuyoushuo.commonlib.utils.RxBus;
 import cn.fuyoushuo.domain.entity.TabItem;
+import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.R;
 import cn.fuyoushuo.vipmovie.ext.BitmapManger;
 import cn.fuyoushuo.vipmovie.ext.FragmentTagGenerator;
@@ -30,6 +35,8 @@ public class MainActivity extends BaseActivity{
     Handler handler = new Handler();
 
     private CompositeSubscription mSubscriptions;
+
+    List<Fragment> backFragments = new ArrayList<Fragment>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,6 +152,35 @@ public class MainActivity extends BaseActivity{
             }
             fragmentManager.executePendingTransactions();
         }
+    }
+
+    private long exitTime = 0;
+
+    @Override
+    public void onBackPressed() {
+        boolean isBackDone = false;
+        if(mContent != null && mContent instanceof TabFragment){
+            isBackDone = ((TabFragment) mContent).goback();
+        }
+        if(!isBackDone){
+            exit();
+        }
+    }
+
+
+    //所有Activity退出
+    public void exit() {
+        if ((System.currentTimeMillis() - exitTime) > 2000) {
+            Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
+            exitTime = System.currentTimeMillis();
+        } else {
+            finishAll();
+        }
+    }
+
+    public void finishAll(){
+        MyApplication.getMyapplication().finishAllActivity();
+        MyApplication.getMyapplication().finishProgram();
     }
 
     @Override
