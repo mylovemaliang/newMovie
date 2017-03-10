@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import cn.fuyoushuo.commonlib.utils.RxBus;
+import cn.fuyoushuo.domain.entity.HistoryItem;
 import cn.fuyoushuo.vipmovie.R;
 import cn.fuyoushuo.vipmovie.ext.FragmentTagGenerator;
 import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
@@ -161,6 +162,12 @@ public class TabFragment extends BaseFragment{
                     String url = event.getNewItem().getNewUrl();
                     TabFragment.this.contentFragment.loadUrl(url);
                     switchContent(mContent, TabFragment.this.contentFragment);
+                }
+                else if(busEvent instanceof SearchDialogFragment.toContentPageFromSearchEvent){
+                    SearchDialogFragment.toContentPageFromSearchEvent event = (SearchDialogFragment.toContentPageFromSearchEvent) busEvent;
+                    HistoryItem historyItem = event.getHistoryItem();
+                    contentFragment.loadUrl(historyItem);
+                    switchContent(mContent,contentFragment);
                 }
             }
         }));

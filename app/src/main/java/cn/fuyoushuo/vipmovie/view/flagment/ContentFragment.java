@@ -3,16 +3,24 @@ package cn.fuyoushuo.vipmovie.view.flagment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.zhy.android.percent.support.PercentLinearLayout;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Stack;
 
 import butterknife.Bind;
+import cn.fuyoushuo.domain.entity.HistoryItem;
 import cn.fuyoushuo.vipmovie.R;
+import cn.fuyoushuo.vipmovie.presenter.impl.SearchPresenter;
 
 /**
  * Created by QA on 2017/3/7.
@@ -20,15 +28,25 @@ import cn.fuyoushuo.vipmovie.R;
 
 public class ContentFragment extends BaseFragment {
 
-    @Bind(R.id.head_search_text)
+    @Bind(R.id.content_searchText)
     TextView headText;
 
     @Bind(R.id.content_wv)
     WebView webView;
 
+    @Bind(R.id.content_head_area)
+    PercentLinearLayout ContentHeadArea;
+
+    @Bind(R.id.progressBar)
+    ProgressBar progressBar;
+
     private String firstLoadUrl;
 
     private boolean isFirstPop = false;
+
+    private Long currentHisId;
+
+    private boolean onlyOnePage = true;
 
     private Stack<String> historyStack = new Stack<String>();
 
@@ -68,19 +86,35 @@ public class ContentFragment extends BaseFragment {
             @Override
             public void onReceivedTitle(WebView view, final String title) {
                 super.onReceivedTitle(view, title);
+                headText.setText(title);
+                if(currentHisId != null){
+                  SearchPresenter.updateHistoryTitle(currentHisId,title);
+                }
+            }
+
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                super.onProgressChanged(view, newProgress);
+                if(newProgress==100){
+                    progressBar.setVisibility(View.GONE);//加载完网页进度条消失
+                }
+                else{
+                    progressBar.setVisibility(View.VISIBLE);//开始加载网页时显示进度条
+                    progressBar.setProgress(newProgress);//设置进度值
+                }
             }
         });
 
         webView.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if(!TextUtils.isEmpty(url)){
-                    view.loadUrl(url);
-                    if(url.indexOf("&isPopPrecess=1") < 0){
-                        historyStack.add(url);
-                    }
-                    return false;
+                WebView.HitTestResult hitTestResult = view.getHitTestResult();
+                //hitTestResult==null解决重定向问题
+               if (!TextUtils.isEmpty(url) && hitTestResult.getExtra() == null) {
+                     view.loadUrl(url);
+                     return true;
                 }
+                historyStack.push(url);
                 return super.shouldOverrideUrlLoading(view,url);
             }
 
@@ -107,12 +141,49 @@ public class ContentFragment extends BaseFragment {
      * @param url
      */
     public void loadUrl(String url){
-      if(isDetached()) return;
+      if(isDetched) return;
+      currentHisId = null;
+      onlyOnePage  = true;
       if(webView != null){
           isFirstPop = false;
           firstLoadUrl = url;
           webView.loadUrl(url);
       }
+    }
+
+    /**
+     * 供搜索页加载页面
+     * @param historyItem
+     */
+    public void loadUrl(HistoryItem historyItem){
+    try {
+        if(isDetched) return;
+        onlyOnePage = true;
+        ContentHeadArea.setVisibility(View.GONE);
+        Long id = historyItem.getId();
+        int historyType = historyItem.getHistoryType();
+        String historyTitle = historyItem.getHistoryTitle();
+        String historyUrl = historyItem.getHistoryUrl();
+        if(historyType == 1){
+            currentHisId = id;
+            isFirstPop = false;
+            firstLoadUrl = historyUrl;
+            if(webView != null){
+                webView.loadUrl(historyUrl);
+            }
+
+        }
+        if(historyType == 2){
+           String url = "https://m.baidu.com/s?wd="+ URLEncoder.encode(historyTitle,"utf-8");
+            isFirstPop = false;
+            firstLoadUrl  = url;
+            if(webView != null){
+                webView.loadUrl(url);
+            }
+        }
+       } catch (UnsupportedEncodingException e) {
+
+       }
     }
 
     public static ContentFragment newInstance() {
@@ -123,12 +194,19 @@ public class ContentFragment extends BaseFragment {
     }
 
     public boolean goBack(){
+        if(!isHistoryEmpty()){
+            //移除当前页面
+            historyStack.pop();
+        }
         if(webView != null && !isHistoryEmpty()){
             String pop = historyStack.pop();
             webView.loadUrl(pop+"&isPopPrecess=1");
             return true;
         }
         else if(!isFirstPop){
+            if(onlyOnePage){
+                return false;
+            }
             webView.loadUrl(firstLoadUrl+"&isPopPrecess=1");
             isFirstPop = true;
             return true;

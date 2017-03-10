@@ -24,6 +24,8 @@ public class Constants {
 
     public static final String ENDPOINT_NEWS="http://newswifiapi.dftoutiao.com";
 
+    public static final String ENDPOINT_BAIDU="http://www.baidu.com";
+
 
 
     //测试

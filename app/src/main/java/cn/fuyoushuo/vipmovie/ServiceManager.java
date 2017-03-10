@@ -1,7 +1,10 @@
 package cn.fuyoushuo.vipmovie;
 
 import android.content.Context;
+import android.text.TextUtils;
+import android.util.Log;
 
+import com.github.lazylibrary.util.NetWorkUtils;
 import com.google.gson.GsonBuilder;
 
 import java.io.File;
@@ -9,14 +12,20 @@ import java.io.IOException;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
 
+import cn.fuyoushuo.commonlib.utils.CommonUtils;
 import cn.fuyoushuo.commonlib.utils.Constants;
+import cn.fuyoushuo.domain.httpservice.BaiduHttpService;
 import cn.fuyoushuo.domain.httpservice.FqbbHttpService;
 import cn.fuyoushuo.domain.httpservice.NewsHttpService;
 import okhttp3.Cache;
+import okhttp3.CacheControl;
+import okhttp3.Connection;
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -65,13 +74,16 @@ public class ServiceManager {
 
 
             //缓存处理
-            final File baseDir = context.getCacheDir();
+            final File baseDir = CommonUtils.getCachePath(context);
             if (baseDir != null) {
                 final File cacheDir = new File(baseDir, "HttpResponseCache");
                 clientBuilder.cache(new Cache(cacheDir, Constants.HTTP_RESPONSE_DISK_CACHE_MAX_SIZE));
             }
 
             clientBuilder.interceptors().add(new ServiceInterceptor());
+            if(t.getName().equals(BaiduHttpService.class.getName())){
+                clientBuilder.interceptors().add(new JsonInterceptor());
+            }
 
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getEndPoint(t))
@@ -100,6 +112,9 @@ public class ServiceManager {
         if(t.getName().equals(NewsHttpService.class.getName())){
             endPoint = Constants.ENDPOINT_NEWS;
         }
+        if(t.getName().equals(BaiduHttpService.class.getName())){
+            endPoint = Constants.ENDPOINT_BAIDU;
+        }
         if ("".equals(endPoint)) {
             throw new IllegalArgumentException("Error: Can't get end point url. Please configure at the method " + ServiceManager.class.getSimpleName() + ".getEndPoint(T t)");
         }
@@ -113,8 +128,27 @@ public class ServiceManager {
         @Override
         public Response intercept(Chain chain) throws IOException {
             Request request = chain.request();
-            Response response = chain.proceed(request);
+            Response response;
+            if(NetWorkUtils.getNetworkTypeName(context).equals(NetWorkUtils.NETWORK_TYPE_DISCONNECT)){
+                Request newRuquest = request.newBuilder().cacheControl(CacheControl.FORCE_CACHE).build();
+                response = chain.proceed(newRuquest);
+            }else{
+                Request newRuquest = request.newBuilder().cacheControl(CacheControl.FORCE_NETWORK).build();
+                response = chain.proceed(newRuquest);
+            }
             return response;
+      }
+    }
+
+    static class JsonInterceptor implements Interceptor {
+        @Override
+        public Response intercept(Chain chain) throws IOException {
+            Response originResponse = chain.proceed(chain.request());
+            String string = originResponse.body().string();
+            String replaceString = string.replace("(", "").replace(")", "");
+            //Log.d("json interceptor:",replaceString);
+            Response newResponse = originResponse.newBuilder().body(ResponseBody.create(MediaType.parse("text/json,charset=gbk"), replaceString)).build();
+            return newResponse;
         }
     }
 }

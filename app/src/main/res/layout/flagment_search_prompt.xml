@@ -1,0 +1,106 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/module_19"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.zhy.android.percent.support.PercentRelativeLayout
+        android:id="@+id/search_prompt_flagment_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@android:color/white"
+        android:elevation="4dp">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_widthPercent="15%"
+            android:id="@+id/search_prompt_flagment_cancel_area">
+
+           <ImageView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:src="@mipmap/back"
+               android:layout_centerInParent="true" />
+        </RelativeLayout>
+
+
+        <com.zhy.android.percent.support.PercentLinearLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_heightPercent="75%"
+            app:layout_widthPercent="65%"
+            android:orientation="horizontal"
+            android:layout_toRightOf="@+id/search_prompt_flagment_cancel_area"
+            android:background="@drawable/textborder"
+            android:layout_centerVertical="true">
+
+            <EditText
+                android:layout_width="0dp"
+                app:layout_widthPercent="80%w"
+                app:layout_marginLeftPercent="5%w"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:imeOptions="actionSearch"
+                android:textSize="13sp"
+                android:singleLine="true"
+                android:gravity="left|center_vertical"
+                android:hint="搜索或输入网址"
+                android:textCursorDrawable="@null"
+                android:id="@+id/serach_prompt_flagment_searchText"/>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                app:layout_widthPercent="15%w"
+                android:layout_height="match_parent"
+                android:id="@+id/edit_clear_area">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/close_edit"
+                    android:layout_centerInParent="true"/>
+            </RelativeLayout>
+
+        </com.zhy.android.percent.support.PercentLinearLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            app:layout_widthPercent="20%"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:id="@+id/search_prompt_flagment_search_area">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="搜索"
+                android:textColor="@color/module_6"
+                android:textSize="16sp"
+                android:id="@+id/search_prompt_flagment_search"/>
+        </RelativeLayout>
+
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+
+
+    <com.zhy.android.percent.support.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/search_promt_result_area"
+        android:layout_below="@id/search_prompt_flagment_toolbar"
+        android:background="@color/white"
+        android:layout_marginTop="5dp">
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/search_promt_result_rview"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
+        </android.support.v7.widget.RecyclerView>
+
+    </com.zhy.android.percent.support.PercentRelativeLayout>
+</RelativeLayout>

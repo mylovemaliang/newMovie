@@ -12,9 +12,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jakewharton.rxbinding.view.RxView;
+import com.trello.rxlifecycle.FragmentEvent;
 import com.zhy.android.percent.support.PercentRelativeLayout;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import cn.fuyoushuo.commonlib.utils.RxBus;
@@ -35,6 +38,7 @@ import cn.fuyoushuo.vipmovie.view.layout.MyScrollingView;
 import cn.fuyoushuo.vipmovie.view.layout.NewsItemDecoration;
 import cn.fuyoushuo.vipmovie.view.layout.SiteItemDecoration;
 import cn.fuyoushuo.vipmovie.view.layout.TypeItemsDecoration;
+import rx.functions.Action1;
 
 /**
  * Created by QA on 2017/2/22.
@@ -275,6 +279,16 @@ public class MainFragment extends BaseFragment implements IMainView{
             mainPresenter.getNews("toutiao","",false);
             mainPresenter.getHeadSites();
         }
+
+        //顶部点击事件
+        RxView.clicks(title).compose(this.<Void>bindUntilEvent(FragmentEvent.DESTROY_VIEW))
+                .throttleFirst(1000, TimeUnit.MILLISECONDS)
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void aVoid) {
+                        SearchDialogFragment.newInstance().show(getFragmentManager(),"SearchDialogFragment");
+                    }
+                });
     }
 
     //加载更多

@@ -1,38 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <com.zhy.android.percent.support.PercentRelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@color/white">
-        <TextView
+        android:layout_height="50dp"
+        android:background="@color/module_19"
+        android:id="@+id/search_result_header">
+
+        <com.zhy.android.percent.support.PercentLinearLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_widthPercent="80%w"
-            app:layout_heightPercent="70%h"
-            android:background="@drawable/textborder2"
-            android:text="   三生三世桃花开"
-            android:gravity="left|center_vertical"
-            android:textSize="16sp"
-            android:id="@+id/head_search_text"
-            android:layout_centerInParent="true"/>
+            app:layout_heightPercent="75%"
+            app:layout_widthPercent="80%"
+            android:orientation="horizontal"
+            android:background="@drawable/textborder"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/search_head_area">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                app:layout_widthPercent="25%w"
+                android:layout_height="match_parent"
+                android:id="@+id/edit_clear_area">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/search"
+                    android:layout_centerInParent="true"/>
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                app:layout_widthPercent="75%w"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:textSize="13sp"
+                android:singleLine="true"
+                android:gravity="left|center_vertical"
+                android:hint="搜索或输入网址"
+                android:textCursorDrawable="@null"
+                android:id="@+id/content_searchText"/>
+        </com.zhy.android.percent.support.PercentLinearLayout>
+
+        <com.zhy.android.percent.support.PercentLinearLayout
+            android:id="@+id/content_head_area"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/module_19"
+            android:visibility="visible">
+        </com.zhy.android.percent.support.PercentLinearLayout>
     </com.zhy.android.percent.support.PercentRelativeLayout>
 
-    <LinearLayout
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_below="@+id/search_result_header"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/module_19">
-    </LinearLayout>
+        android:layout_height="3dip"
+        android:progressDrawable="@drawable/progressstyle"
+        android:visibility="gone" />
 
     <WebView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1.0"
+        android:layout_height="match_parent"
         android:id="@+id/content_wv"
-        android:layout_marginTop="5dp">
+        android:layout_below="@+id/progressBar">
     </WebView>
-</LinearLayout>
+
+
+</RelativeLayout>

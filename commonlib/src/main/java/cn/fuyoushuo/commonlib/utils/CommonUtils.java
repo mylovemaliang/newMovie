@@ -1,7 +1,10 @@
 package cn.fuyoushuo.commonlib.utils;
 
+import android.content.Context;
+import android.os.Environment;
 import android.text.TextUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,5 +60,24 @@ public class CommonUtils {
      */
     public static int getIntHundred(float origin){
        return (int)origin;
+    }
+
+
+    /**
+     * 获取app缓存路径
+     * @param context
+     * @return
+     */
+    public static File getCachePath( Context context ){
+        File cache ;
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+                || !Environment.isExternalStorageRemovable()) {
+            //外部存储可用
+            cache = context.getExternalCacheDir();
+        }else {
+            //外部存储不可用
+            cache = context.getCacheDir();
+        }
+        return cache;
     }
 }

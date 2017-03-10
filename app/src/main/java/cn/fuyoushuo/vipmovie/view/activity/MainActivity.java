@@ -7,13 +7,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import cn.fuyoushuo.commonlib.utils.RxBus;
+import cn.fuyoushuo.domain.entity.StaticData;
 import cn.fuyoushuo.domain.entity.TabItem;
+import cn.fuyoushuo.vipmovie.GreenDaoManger;
 import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.R;
 import cn.fuyoushuo.vipmovie.ext.BitmapManger;

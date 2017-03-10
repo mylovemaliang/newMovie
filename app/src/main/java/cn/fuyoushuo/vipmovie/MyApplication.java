@@ -14,10 +14,13 @@ import com.facebook.common.memory.MemoryTrimmableRegistry;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.producers.LocalFetchProducer;
+import com.facebook.stetho.Stetho;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import java.util.Stack;
 
 import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
+import okhttp3.OkHttpClient;
 
 /**
  * Created by QA on 2016/6/27.
@@ -58,6 +61,12 @@ public class MyApplication extends Application{
         }).build();
         Fresco.initialize(context,config);
         LocalFragmentManger.getIntance().initContext(context);
+        GreenDaoManger.getIntance().initContext(context);
+        GreenDaoManger.getIntance().initDatabase();
+        Stetho.initializeWithDefaults(this);
+        new OkHttpClient.Builder()
+                .addNetworkInterceptor(new StethoInterceptor())
+                .build();
         //初始化异常拦截器
         //CrashHandler.getInstance().init(this);
         //用户登录信息管理
