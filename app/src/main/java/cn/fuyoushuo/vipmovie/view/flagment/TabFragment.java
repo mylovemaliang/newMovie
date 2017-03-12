@@ -21,6 +21,7 @@ import cn.fuyoushuo.domain.entity.HistoryItem;
 import cn.fuyoushuo.vipmovie.R;
 import cn.fuyoushuo.vipmovie.ext.FragmentTagGenerator;
 import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
+import cn.fuyoushuo.vipmovie.po.LoadItem;
 import cn.fuyoushuo.vipmovie.presenter.impl.TabPresenter;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -90,10 +91,8 @@ public class TabFragment extends BaseFragment{
     protected void initView() {
         super.initView();
         mainFragment = MainFragment.newInstance();
-        contentFragment = ContentFragment.newInstance();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.tab_fragment_area,mainFragment,"main_fragment").show(mainFragment);
-        fragmentTransaction.add(R.id.tab_fragment_area,contentFragment,"content_fragment").hide(contentFragment);
         mContent = mainFragment;
         fragmentTransaction.commitAllowingStateLoss();
         fragmentManager.executePendingTransactions();
@@ -133,7 +132,7 @@ public class TabFragment extends BaseFragment{
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.addToBackStack(null);
             if (!to.isAdded()) {    // 先判断是否被add过
-                transaction.hide(from).add(R.id.fragment_area,to).commitAllowingStateLoss();
+                transaction.hide(from).add(R.id.tab_fragment_area,to).commitAllowingStateLoss();
                 // 隐藏当前的fragment，add下一个到Activity中
             } else {
                 transaction.hide(from).show(to).commitAllowingStateLoss(); // 隐藏当前的fragment，显示下一个
@@ -160,17 +159,59 @@ public class TabFragment extends BaseFragment{
                     //替换子fragment,这里需要新建fragment,不能使用hide,show
                     MainFragment.toContentViewEvent event = (MainFragment.toContentViewEvent) busEvent;
                     String url = event.getNewItem().getNewUrl();
-                    TabFragment.this.contentFragment.loadUrl(url);
-                    switchContent(mContent, TabFragment.this.contentFragment);
+                    handCommonToContentEvent(url);
                 }
                 else if(busEvent instanceof SearchDialogFragment.toContentPageFromSearchEvent){
                     SearchDialogFragment.toContentPageFromSearchEvent event = (SearchDialogFragment.toContentPageFromSearchEvent) busEvent;
                     HistoryItem historyItem = event.getHistoryItem();
-                    contentFragment.loadUrl(historyItem);
-                    switchContent(mContent,contentFragment);
+                    handToContentEvent(historyItem);
                 }
             }
         }));
+    }
+
+    private void handCommonToContentEvent(String url){
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.addToBackStack(null);
+        if(contentFragment != null && fragmentManager.findFragmentByTag("content_fragment") != null){
+            fragmentTransaction.remove(contentFragment);
+        }
+        LoadItem loadItem = new LoadItem(1,url,null).bindId(-1l);
+        ContentFragment contentFragment = ContentFragment.newInstance(loadItem);
+        this.contentFragment = contentFragment;
+        fragmentTransaction.hide(mainFragment).add(R.id.tab_fragment_area,this.contentFragment,"content_fragment").show(contentFragment);
+        mContent = this.contentFragment;
+        fragmentTransaction.commitAllowingStateLoss();
+        fragmentManager.executePendingTransactions();
+    }
+
+    private void handToContentEvent(HistoryItem historyItem){
+        int historyType = historyItem.getHistoryType();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.addToBackStack(null);
+        if(contentFragment != null && fragmentManager.findFragmentByTag("content_fragment") != null){
+            fragmentTransaction.remove(contentFragment);
+        }
+        if(historyType == 1){
+            Long id = historyItem.getId();
+            String historyUrl = historyItem.getHistoryUrl();
+            LoadItem loadItem = new LoadItem(2,historyUrl,null).bindId(id);
+            ContentFragment contentFragment = ContentFragment.newInstance(loadItem);
+            this.contentFragment = contentFragment;
+            fragmentTransaction.hide(mainFragment).add(R.id.tab_fragment_area,this.contentFragment,"content_fragment").show(contentFragment);
+            mContent = this.contentFragment;
+        }
+        if(historyType == 2){
+            Long id = historyItem.getId();
+            String keyword = historyItem.getHistoryTitle();
+            LoadItem loadItem = new LoadItem(3,null,keyword).bindId(id);
+            ContentFragment contentFragment = ContentFragment.newInstance(loadItem);
+            this.contentFragment = contentFragment;
+            fragmentTransaction.hide(mainFragment).add(R.id.tab_fragment_area,this.contentFragment,"content_fragment").show(contentFragment);
+            mContent = this.contentFragment;
+        }
+        fragmentTransaction.commitAllowingStateLoss();
+        fragmentManager.executePendingTransactions();
     }
 
     @Override
@@ -196,11 +237,14 @@ public class TabFragment extends BaseFragment{
                  return true;
             }
         }
-        boolean isGoBackDone = fragmentManager.popBackStackImmediate();
-        if(isGoBackDone){
-            mContent = mainFragment;
+        boolean isGobackDone = false;
+        if(mContent == contentFragment){
+            switchContent(mContent,mainFragment);
+            isGobackDone = true;
+        }else if(mContent == mainFragment){
+            isGobackDone = false;
         }
-        return isGoBackDone;
+        return isGobackDone;
     }
 
     public static TabFragment newInstance(Integer fragmentId) {

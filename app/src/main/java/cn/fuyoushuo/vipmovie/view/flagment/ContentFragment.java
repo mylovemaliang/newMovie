@@ -13,13 +13,12 @@ import android.widget.TextView;
 
 import com.zhy.android.percent.support.PercentLinearLayout;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Stack;
 
 import butterknife.Bind;
-import cn.fuyoushuo.domain.entity.HistoryItem;
 import cn.fuyoushuo.vipmovie.R;
+import cn.fuyoushuo.vipmovie.po.LoadItem;
 import cn.fuyoushuo.vipmovie.presenter.impl.SearchPresenter;
 
 /**
@@ -42,13 +41,15 @@ public class ContentFragment extends BaseFragment {
 
     private String firstLoadUrl;
 
-    private boolean isFirstPop = false;
-
     private Long currentHisId;
 
-    private boolean onlyOnePage = true;
+    private String keyword;
 
-    private Stack<String> historyStack = new Stack<String>();
+    // 1,普通url;2,搜索url;3,搜索关键字
+    private int loadType;
+
+    //标题重置没
+    private boolean isTitleSet = false;
 
 
     @Override
@@ -63,6 +64,36 @@ public class ContentFragment extends BaseFragment {
 
     @Override
     protected void initData() {
+        Bundle arguments = getArguments();
+        if(arguments != null){
+            String loadUrl = arguments.getString("loadUrl","");
+            int loadType = arguments.getInt("loadType",0);
+            Long hisId = arguments.getLong("currentHisId");
+            String keyWord = arguments.getString("keyWord","");
+            initArgs(loadType,loadUrl,hisId,keyWord);
+
+        }
+    }
+
+    private void initArgs(int loadType,String loadUrl,Long hisId ,String keyWord) {
+        try{
+        if(loadType == 1){
+            this.loadType  = loadType;
+            this.firstLoadUrl = loadUrl;
+        }
+        else if(loadType == 2){
+            this.loadType = loadType;
+            this.firstLoadUrl = loadUrl;
+            this.currentHisId = hisId;
+        }
+        else if(loadType == 3){
+            this.loadType = loadType;
+            this.keyword = keyWord;
+            this.firstLoadUrl = "https://m.baidu.com/s?wd="+ URLEncoder.encode(keyWord,"utf-8");
+        }
+        }catch (Exception e){
+
+        }
     }
 
     @Override
@@ -87,8 +118,9 @@ public class ContentFragment extends BaseFragment {
             public void onReceivedTitle(WebView view, final String title) {
                 super.onReceivedTitle(view, title);
                 headText.setText(title);
-                if(currentHisId != null){
-                  SearchPresenter.updateHistoryTitle(currentHisId,title);
+                if(currentHisId != null && loadType == 2 && isTitleSet == false){
+                   SearchPresenter.updateHistoryTitle(currentHisId,title);
+                   isTitleSet = true;
                 }
             }
 
@@ -108,13 +140,9 @@ public class ContentFragment extends BaseFragment {
         webView.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                WebView.HitTestResult hitTestResult = view.getHitTestResult();
-                //hitTestResult==null解决重定向问题
-               if (!TextUtils.isEmpty(url) && hitTestResult.getExtra() == null) {
+                if (!TextUtils.isEmpty(url)) {
                      view.loadUrl(url);
-                     return true;
                 }
-                historyStack.push(url);
                 return super.shouldOverrideUrlLoading(view,url);
             }
 
@@ -134,83 +162,33 @@ public class ContentFragment extends BaseFragment {
     @Override
     public void onStart() {
         super.onStart();
+        startPage();
     }
 
-    /**
-     * 供外部调用加载url
-     * @param url
-     */
-    public void loadUrl(String url){
-      if(isDetched) return;
-      currentHisId = null;
-      onlyOnePage  = true;
-      if(webView != null){
-          isFirstPop = false;
-          firstLoadUrl = url;
-          webView.loadUrl(url);
-      }
-    }
-
-    /**
-     * 供搜索页加载页面
-     * @param historyItem
-     */
-    public void loadUrl(HistoryItem historyItem){
-    try {
-        if(isDetched) return;
-        onlyOnePage = true;
-        ContentHeadArea.setVisibility(View.GONE);
-        Long id = historyItem.getId();
-        int historyType = historyItem.getHistoryType();
-        String historyTitle = historyItem.getHistoryTitle();
-        String historyUrl = historyItem.getHistoryUrl();
-        if(historyType == 1){
-            currentHisId = id;
-            isFirstPop = false;
-            firstLoadUrl = historyUrl;
-            if(webView != null){
-                webView.loadUrl(historyUrl);
-            }
-
+    private void startPage(){
+        if(webView != null && !TextUtils.isEmpty(firstLoadUrl)){
+            webView.loadUrl(firstLoadUrl);
         }
-        if(historyType == 2){
-           String url = "https://m.baidu.com/s?wd="+ URLEncoder.encode(historyTitle,"utf-8");
-            isFirstPop = false;
-            firstLoadUrl  = url;
-            if(webView != null){
-                webView.loadUrl(url);
-            }
-        }
-       } catch (UnsupportedEncodingException e) {
-
-       }
     }
 
-    public static ContentFragment newInstance() {
+
+
+    public static ContentFragment newInstance(LoadItem loadItem) {
         Bundle args = new Bundle();
         ContentFragment fragment = new ContentFragment();
+        args.putInt("loadType",loadItem.getLoadType());
+        args.putString("loadUrl",loadItem.getLoadURL());
+        args.putString("keyWord",loadItem.getKeyWord());
+        args.putLong("currentHisId",loadItem.getHistoryId());
         fragment.setArguments(args);
         return fragment;
     }
 
     public boolean goBack(){
-        if(!isHistoryEmpty()){
-            //移除当前页面
-            historyStack.pop();
-        }
-        if(webView != null && !isHistoryEmpty()){
-            String pop = historyStack.pop();
-            webView.loadUrl(pop+"&isPopPrecess=1");
+        if(webView != null && webView.canGoBack()){
+            webView.goBack();
             return true;
-        }
-        else if(!isFirstPop){
-            if(onlyOnePage){
-                return false;
-            }
-            webView.loadUrl(firstLoadUrl+"&isPopPrecess=1");
-            isFirstPop = true;
-            return true;
-        } else{
+        }else{
             return false;
         }
     }
@@ -229,12 +207,5 @@ public class ContentFragment extends BaseFragment {
         }
     }
 
-    //-----------------------------------------关于后退栈的操作-----------------------------------------------
-    private boolean isHistoryEmpty(){
-        if(historyStack.size() == 0){
-            return true;
-        }else{
-            return false;
-        }
-    }
+
 }
