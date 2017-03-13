@@ -2,6 +2,7 @@ package cn.fuyoushuo.vipmovie.view.flagment;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -60,6 +61,8 @@ public class TabFragment extends BaseFragment{
 
     //主fragment
     MainFragment mainFragment;
+
+    Handler handler = new Handler();
 
     @Override
     protected String getPageName() {
@@ -146,25 +149,37 @@ public class TabFragment extends BaseFragment{
             @Override
             public void onCompleted() {
 
-            }
+                }
 
-            @Override
-            public void onError(Throwable e) {
-                return;
-            }
+                @Override
+                public void onError(Throwable e) {
+                    return;
+                }
 
-            @Override
-            public void onNext(RxBus.BusEvent busEvent) {
-                if(busEvent instanceof MainFragment.toContentViewEvent){
-                    //替换子fragment,这里需要新建fragment,不能使用hide,show
-                    MainFragment.toContentViewEvent event = (MainFragment.toContentViewEvent) busEvent;
-                    String url = event.getNewItem().getNewUrl();
-                    handCommonToContentEvent(url);
+                @Override
+                public void onNext(RxBus.BusEvent busEvent) {
+                    if(busEvent instanceof MainFragment.toContentViewEvent){
+                        //替换子fragment,这里需要新建fragment,不能使用hide,show
+                        MainFragment.toContentViewEvent event = (MainFragment.toContentViewEvent) busEvent;
+                        final String url = event.getNewItem().getNewUrl();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                handCommonToContentEvent(url);
+                            }
+                        },200);
+                        return;
                 }
                 else if(busEvent instanceof SearchDialogFragment.toContentPageFromSearchEvent){
                     SearchDialogFragment.toContentPageFromSearchEvent event = (SearchDialogFragment.toContentPageFromSearchEvent) busEvent;
-                    HistoryItem historyItem = event.getHistoryItem();
-                    handToContentEvent(historyItem);
+                    final HistoryItem historyItem = event.getHistoryItem();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            handToContentEvent(historyItem);
+                        }
+                    },200);
+                    return;
                 }
             }
         }));
@@ -172,14 +187,13 @@ public class TabFragment extends BaseFragment{
 
     private void handCommonToContentEvent(String url){
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.addToBackStack(null);
         if(contentFragment != null && fragmentManager.findFragmentByTag("content_fragment") != null){
             fragmentTransaction.remove(contentFragment);
         }
         LoadItem loadItem = new LoadItem(1,url,null).bindId(-1l);
         ContentFragment contentFragment = ContentFragment.newInstance(loadItem);
         this.contentFragment = contentFragment;
-        fragmentTransaction.hide(mainFragment).add(R.id.tab_fragment_area,this.contentFragment,"content_fragment").show(contentFragment);
+        fragmentTransaction.hide(mainFragment).add(R.id.tab_fragment_area,contentFragment,"content_fragment");
         mContent = this.contentFragment;
         fragmentTransaction.commitAllowingStateLoss();
         fragmentManager.executePendingTransactions();
@@ -188,7 +202,6 @@ public class TabFragment extends BaseFragment{
     private void handToContentEvent(HistoryItem historyItem){
         int historyType = historyItem.getHistoryType();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.addToBackStack(null);
         if(contentFragment != null && fragmentManager.findFragmentByTag("content_fragment") != null){
             fragmentTransaction.remove(contentFragment);
         }
@@ -198,7 +211,7 @@ public class TabFragment extends BaseFragment{
             LoadItem loadItem = new LoadItem(2,historyUrl,null).bindId(id);
             ContentFragment contentFragment = ContentFragment.newInstance(loadItem);
             this.contentFragment = contentFragment;
-            fragmentTransaction.hide(mainFragment).add(R.id.tab_fragment_area,this.contentFragment,"content_fragment").show(contentFragment);
+            fragmentTransaction.hide(mainFragment).add(R.id.tab_fragment_area,contentFragment,"content_fragment");
             mContent = this.contentFragment;
         }
         if(historyType == 2){
@@ -207,7 +220,7 @@ public class TabFragment extends BaseFragment{
             LoadItem loadItem = new LoadItem(3,null,keyword).bindId(id);
             ContentFragment contentFragment = ContentFragment.newInstance(loadItem);
             this.contentFragment = contentFragment;
-            fragmentTransaction.hide(mainFragment).add(R.id.tab_fragment_area,this.contentFragment,"content_fragment").show(contentFragment);
+            fragmentTransaction.hide(mainFragment).add(R.id.tab_fragment_area,contentFragment,"content_fragment");
             mContent = this.contentFragment;
         }
         fragmentTransaction.commitAllowingStateLoss();

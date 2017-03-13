@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 import com.facebook.common.memory.MemoryTrimType;
 import com.facebook.common.memory.MemoryTrimmable;
@@ -16,6 +17,8 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.producers.LocalFetchProducer;
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
+import com.tencent.smtt.sdk.QbSdk;
+import com.tencent.smtt.sdk.TbsListener;
 
 import java.util.Stack;
 
@@ -67,6 +70,40 @@ public class MyApplication extends Application{
         new OkHttpClient.Builder()
                 .addNetworkInterceptor(new StethoInterceptor())
                 .build();
+
+        QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
+
+            @Override
+            public void onViewInitFinished(boolean arg0) {
+                // TODO Auto-generated method stub
+                Log.e("###app qbk init###", " onViewInitFinished is " + arg0);
+            }
+
+            @Override
+            public void onCoreInitFinished() {
+                // TODO Auto-generated method stub
+
+            }
+        };
+
+        QbSdk.setTbsListener(new TbsListener() {
+            @Override
+            public void onDownloadFinish(int i) {
+                Log.d("###app qbk init###","onDownloadFinish");
+            }
+
+            @Override
+            public void onInstallFinish(int i) {
+                Log.d("###app qbk init###","onInstallFinish");
+            }
+
+            @Override
+            public void onDownloadProgress(int i) {
+                Log.d("###app qbk init###","onDownloadProgress:"+i);
+            }
+        });
+
+        QbSdk.initX5Environment(getApplicationContext(),  cb);
         //初始化异常拦截器
         //CrashHandler.getInstance().init(this);
         //用户登录信息管理

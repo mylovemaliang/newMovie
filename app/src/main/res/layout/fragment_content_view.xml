@@ -67,12 +67,16 @@
         android:progressDrawable="@drawable/progressstyle"
         android:visibility="gone" />
 
-    <WebView
+    <com.tencent.smtt.sdk.WebView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/content_wv"
         android:layout_below="@+id/progressBar">
-    </WebView>
+    </com.tencent.smtt.sdk.WebView>
 
+    <FrameLayout
+        android:id="@+id/videoContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>

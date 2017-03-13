@@ -101,12 +101,12 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
         searchEditText.setFocusable(true);
         searchEditText.requestFocus();
         //延时弹出键盘
-        (new Handler()).postDelayed(new Runnable() {
-            public void run() {
-                InputMethodManager inManager = (InputMethodManager)searchEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                inManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-            }
-        },500);
+//        (new Handler()).postDelayed(new Runnable() {
+//            public void run() {
+//                InputMethodManager inManager = (InputMethodManager)searchEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//                inManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+//            }
+//        },500);
 
         searchHisAdapter = new SearchHisAdapter();
         searchHisAdapter.setOnHisClick(new SearchHisAdapter.OnHisClick() {
