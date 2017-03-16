@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="format-detection" content="email=no" />
+    <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge,chrome=1" />
+    <title>返钱宝宝_导航页</title>
+    <meta http-equiv="Cache-Control" content="no-transform " />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="js/lib/flexible/flexible.css">
+    <script src='js/lib/flexible/flexible.js'></script>
+    <script src='js/lib/zepto/zepto.js'></script>
+    <style>
+    .main-category,.main-category a{
+        color: #2D2D2D;
+    }
+    .main-category .name {
+        height: 1.06667rem;
+        border-bottom: 1px solid #ece9e9;
+        line-height: 1.06667rem;
+        display: -webkit-box;
+    }
+    
+    .sub-category ul {
+        overflow: hidden;
+        width: 96%;
+        margin: 0 auto;
+        border-bottom: 1px solid #ece9e9;
+        height: 1.2rem;
+        line-height: 1.2rem;
+    }
+    
+    .sub-category li {
+        text-align: center;
+        float: left;
+        width: 20%;
+    }
+    
+    .sub-category {
+        transition: height 0.6s ease;
+        height: 0;
+    overflow: hidden;
+    }
+    
+    .icon {
+        display: inline-block;
+        width: 32px;
+        height: 22px;
+        background-image: url(images/nav.png);
+        vertical-align: middle;
+    }
+    
+    .icon-game {
+        background-position: -2px 0;
+    }
+    .icon-shopping {
+        background-position: -2px -30px;
+    }
+    .icon-video{
+        background-position: -2px -60px;
+    }
+    .icon-main{
+        background-position: -2px -90px;
+    }
+    .icon-yule{
+        background-position: -2px -120px;
+    }
+     .icon-toutiao{
+        background-position: -2px -150px;
+    }
+    .icon-up {
+        background-position: -2px -207px;
+    }
+    .icon-down {
+        background-position: -2px -227px;
+    }
+    .sub-category li:first-child {
+        color: #E5B670;
+    }
+    .sub-category li:first-child {
+        content: "";
+    }
+    </style>
+</head>
+
+<body>
+    <!-- <ul class="main-category">
+        <li>
+            <p class="name"><span style="-webkit-box-flex: 1;display: block;"><span class="icon icon-remen"></span>热门</span><span class="icon icon-fold icon-up"></span></p>
+            <div class="sub-category">
+                <ul>
+                    <li>新闻</li>
+                    <li>看点</li>
+                    <li>腾讯</li>
+                    <li>凤凰</li>
+                    <li>环球网</li>
+                </ul>
+                <ul>
+                    <li>新闻</li>
+                    <li>看点</li>
+                    <li>腾讯</li>
+                    <li>凤凰</li>
+                    <li>环球网</li>
+                </ul>
+                <ul>
+                    <li>新闻</li>
+                    <li>看点</li>
+                    <li>腾讯</li>
+                    <li>凤凰</li>
+                    <li>环球网</li>
+                </ul>
+                <ul>
+                    <li>新闻</li>
+                    <li>看点</li>
+                    <li>腾讯</li>
+                    <li>凤凰</li>
+                    <li>环球网</li>
+                </ul>
+                <ul>
+                    <li>新闻</li>
+                    <li>看点</li>
+                    <li>腾讯</li>
+                    <li>凤凰</li>
+                    <li>环球网</li>
+                </ul>
+            </div>
+        </li>
+    </ul> -->
+    <script type="text/javascript">
+    $("body").delegate(".icon-fold", "click", function() {
+        if ($(this).hasClass("icon-down")) {
+            $(this).removeClass("icon-down").addClass("icon-up");
+            $(this).parents(".main-category").find(".sub-category").css("height",+$(this).attr("animateHeight")+4/+$("html").css("fontSize").replace("px","")+"rem");
+        } else {
+            $(this).removeClass("icon-up").addClass("icon-down");
+            $(this).parents(".main-category").find(".sub-category").css("height","0");
+        }
+    })
+    var html = "";
+
+    var datas = [{
+        "piyin": "main",
+        "name": "热门",
+        "subset": [{
+            "name": "新闻",
+            "subset": [{
+                "name": "网易",
+                "url": "http://www.163.com/"
+            }, {
+                "name": "腾讯",
+                "url": "http://www.qq.com/"
+            }, {
+                "name": "凤凰",
+                "url": "http://www.ifeng.com/"
+            }, {
+                "name": "环球网",
+                "url": "http://www.huanqiu.com/"
+            }]
+        }, {
+            "name": "小说",
+            "subset": [{
+                "name": "书旗",
+                "url": "http://www.qisuu.com/"
+            }, {
+                "name": "穿越",
+                "url": "http://book.km.com/"
+            }, {
+                "name": "红袖",
+                "url": "http://www.hongxiu.com/"
+            }, {
+                "name": "起点",
+                "url": "http://www.qidian.com/"
+            }]
+        }, {
+            "name": "视频",
+            "subset": [{
+                "name": "爱奇艺",
+                "url": "http://www.iqiyi.com/"
+            }, {
+                "name": "优酷",
+                "url": "http://www.youku.com/"
+            }, {
+                "name": "土豆",
+                "url": "http://www.tudou.com/"
+            }, {
+                "name": "腾讯",
+                "url": "http://v.qq.com/"
+            }]
+        }, {
+            "name": "商城",
+            "subset": [{
+                "name": "爱淘宝",
+                "url": "http://ai.taobao.com/"
+            }, {
+                "name": "天猫",
+                "url": "https://www.tmall.com/"
+            }, {
+                "name": "京东",
+                "url": "https://www.jd.com/"
+            }, {
+                "name": "苏宁",
+                "url": "http://www.suning.com/"
+            }]
+        }]
+    }, {
+        "piyin": "shopping",
+        "name": "购物",
+        "subset": [{
+            "name": "购物",
+            "subset": [{
+                "name": "男装",
+                "url": "https://nanzhuang.tmall.com/"
+            }, {
+                "name": "女装",
+                "url": "https://nvzhuang.tmall.com/"
+            }, {
+                "name": "美妆",
+                "url": "https://meizhuang.tmall.com/"
+            }, {
+                "name": "箱包",
+                "url": "https://bag.tmall.com/"
+            }]
+        }, {
+            "name": "热卖",
+            "subset": [{
+                "name": "聚美",
+                "url": "http://www.jumei.com/"
+            }, {
+                "name": "唯品会",
+                "url": "http://www.vip.com/"
+            }, {
+                "name": "易贷",
+                "url": "http://edai.com/"
+            }, {
+                "name": "拍拍贷",
+                "url": "http://www.ppdai.com/"
+            }]
+        }, {
+            "name": "团购",
+            "subset": [{
+                "name": "美团",
+                "url": "baidu.com"
+            }, {
+                "name": "糯米",
+                "url": "baidu.com"
+            }, {
+                "name": "爱淘宝",
+                "url": "baidu.com"
+            }, {
+                "name": "团800",
+                "url": "baidu.com"
+            }]
+        }, {
+            "name": "贷款",
+            "subset": [{
+                "name": "宜人贷",
+                "url": "https://www.yirendai.com/"
+            }, {
+                "name": "人人贷",
+                "url": "https://www.we.com/"
+            }, {
+                "name": "易贷",
+                "url": "http://edai.com/"
+            }, {
+                "name": "拍拍贷",
+                "url": "http://www.ppdai.com/"
+            }]
+        }]
+    }, {
+        "piyin": "toutiao",
+        "name": "资讯",
+        "subset": [{
+            "name": "门户",
+            "subset": [{
+                "name": "新浪",
+                "url": "http://www.sina.com.cn/"
+            }, {
+                "name": "网易",
+                "url": "http://www.163.com/"
+            }, {
+                "name": "腾讯",
+                "url": "http://www.qq.com/"
+            }, {
+                "name": "搜狐",
+                "url": "http://www.sohu.com/"
+            }]
+        }, {
+            "name": "时政",
+            "subset": [{
+                "name": "人民网",
+                "url": "http://www.people.com.cn/"
+            }, {
+                "name": "新华网",
+                "url": "http://www.xinhuanet.com/"
+            }, {
+                "name": "央视网",
+                "url": "http://www.cctv.com/"
+            }, {
+                "name": "光明网",
+                "url": "http://www.gmw.cn/"
+            }]
+        }, {
+            "name": "体育",
+            "subset": [{
+                "name": "NBA",
+                "url": "http://china.nba.com/"
+            }, {
+                "name": "腾讯体育",
+                "url": "http://sports.qq.com/"
+            }, {
+                "name": "虎扑",
+                "url": "https://nba.hupu.com/"
+            }, {
+                "name": "搜狐体育",
+                "url": "http://sports.sohu.com/"
+            }]
+        }, {
+            "name": "科技",
+            "subset": [{
+                "name": "ZOL",
+                "url": "http://www.zol.com.cn/"
+            }, {
+                "name": "太平洋",
+                "url": "http://www.pconline.com.cn/"
+            }, {
+                "name": "天极网",
+                "url": "http://www.yesky.com/"
+            }, {
+                "name": "虎嗅",
+                "url": "https://www.huxiu.com/"
+            }]
+        }]
+    }];
+    $.each(datas, function(i, data) {
+        html += '<ul class="main-category"><li><p class="name"><span style="-webkit-box-flex: 1;display: block;"><span class="icon icon-' + data.piyin + '"></span>' + data.name + '</span><span class="icon icon-fold icon-down" animateHeight="'+(data.subset.length*1.2)+'"></span></p><div class="sub-category">';
+        $.each(data.subset, function(i1, data1) {
+            html += "<ul><li>"+data1.name+"</li>";
+            $.each(data1.subset, function(i2, data2) {
+                html += "<li><a target='_blank' href='" + data2.url + "'>" + data2.name + "</a></li>";
+            })
+            html += "</ul>";
+        })
+        html += "</div></li></ul>"
+    })
+    $("body").append(html);
+    </script>
+</body>
+
+</html>

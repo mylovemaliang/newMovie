@@ -21,10 +21,12 @@ import android.widget.Toast;
 
 import com.github.lazylibrary.util.Colors;
 import com.github.lazylibrary.util.DateUtil;
+import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.trello.rxlifecycle.FragmentEvent;
 import com.trello.rxlifecycle.components.support.RxDialogFragment;
 
+import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -42,6 +44,7 @@ import cn.fuyoushuo.vipmovie.view.iview.ISearchView;
 import cn.fuyoushuo.vipmovie.view.layout.DividerItemDecoration;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 
 /**
  * Created by QA on 2017/3/9.
@@ -72,12 +75,17 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
 
     private String input = "";
 
+    private int parentFragmentId;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NORMAL, R.style.fullScreenDialog);
         searchPresenter = new SearchPresenter(this);
+        if(getArguments() != null){
+            this.parentFragmentId = getArguments().getInt("parentFragmentId",-1);
+        }
     }
 
 
@@ -103,8 +111,9 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
         //延时弹出键盘
 //        (new Handler()).postDelayed(new Runnable() {
 //            public void run() {
-//                InputMethodManager inManager = (InputMethodManager)searchEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-//                inManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+//                if(!inputManager.isActive()){
+//                    inputManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+//                }
 //            }
 //        },500);
 
@@ -151,6 +160,49 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
                     }
                 });
 
+        //回退键
+        RxView.clicks(backArea).compose(this.<Void>bindUntilEvent(FragmentEvent.DESTROY_VIEW))
+                .throttleFirst(1000,TimeUnit.MILLISECONDS)
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void aVoid) {
+                        inputManager.hideSoftInputFromWindow(searchEditText.getWindowToken(),0);
+                        dismissAllowingStateLoss();
+                    }
+                });
+
+        //搜索清空键
+        RxView.clicks(editClearArea).compose(this.<Void>bindUntilEvent(FragmentEvent.DESTROY_VIEW))
+                .throttleFirst(1000,TimeUnit.MILLISECONDS)
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void aVoid) {
+                        searchEditText.setText("");
+                        input = "";
+                    }
+                });
+
+        //搜索键
+        RxView.clicks(searchButton).compose(this.<Void>bindUntilEvent(FragmentEvent.DESTROY_VIEW))
+                .throttleFirst(1000,TimeUnit.MILLISECONDS)
+                .subscribe(new Action1<Void>() {
+                    @Override
+                     public void call(Void aVoid) {
+                        if (inputManager.isActive()) {
+                            inputManager.hideSoftInputFromWindow(searchEditText.getApplicationWindowToken(), 0);
+                        }
+                        if(TextUtils.isEmpty(input)){
+                            Toast.makeText(MyApplication.getContext(),"搜索词不能为空",Toast.LENGTH_SHORT).show();
+                        }else{
+                            HistoryItem historyItem = handlerAddSearch();
+                            RxBus.getInstance().send(new toContentPageFromSearchEvent(historyItem,parentFragmentId));
+                            dismissAllowingStateLoss();
+                            // TODO: 2017/3/10
+                        }
+                    }
+                });
+
+
         searchEditText.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -165,7 +217,7 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
                         return false;
                     }else{
                         HistoryItem historyItem = handlerAddSearch();
-                        RxBus.getInstance().send(new toContentPageFromSearchEvent(historyItem));
+                        RxBus.getInstance().send(new toContentPageFromSearchEvent(historyItem,parentFragmentId));
                         dismissAllowingStateLoss();
                         // TODO: 2017/3/10
                     }
@@ -205,9 +257,7 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
         if(searchPresenter != null){
             searchPresenter.addHistory(historyItem, new SearchPresenter.addHistoryCallback() {
                 @Override
-                public void onAddCallBack(Long id, Boolean isOk) {
-                       historyItem.setId(id);
-                }
+                public void onAddCallBack(Boolean isOk) {}
             });
         }
         return historyItem;
@@ -226,10 +276,10 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
         searchPresenter.onDestroy();
     }
 
-    public static SearchDialogFragment newInstance() {
+    public static SearchDialogFragment newInstance(int fragmentId) {
         
         Bundle args = new Bundle();
-        
+        args.putInt("parentFragmentId",fragmentId);
         SearchDialogFragment fragment = new SearchDialogFragment();
         fragment.setArguments(args);
         return fragment;
@@ -255,17 +305,30 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
 
     @Override
     public void setHistorySearchItems(List<HistoryItem> result, boolean isOk) {
-        searchHisAdapter.setData(result);
-        searchHisAdapter.notifyDataSetChanged();
+       if(isOk){
+         searchHisAdapter.setData(result);
+         searchHisAdapter.notifyDataSetChanged();
+       }
     }
 
     //---------------------------------总线事件定义-------------------------------------------
     public class toContentPageFromSearchEvent extends RxBus.BusEvent{
 
-         private HistoryItem historyItem;
+        private HistoryItem historyItem;
 
-        public toContentPageFromSearchEvent(HistoryItem historyItem) {
+        private int parentFragmentId;
+
+        public toContentPageFromSearchEvent(HistoryItem historyItem, int parentFragmentId) {
             this.historyItem = historyItem;
+            this.parentFragmentId = parentFragmentId;
+        }
+
+        public int getParentFragmentId() {
+            return parentFragmentId;
+        }
+
+        public void setParentFragmentId(int parentFragmentId) {
+            this.parentFragmentId = parentFragmentId;
         }
 
         public HistoryItem getHistoryItem() {

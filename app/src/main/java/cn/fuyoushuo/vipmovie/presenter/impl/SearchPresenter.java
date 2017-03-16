@@ -74,7 +74,7 @@ public class SearchPresenter extends BasePresenter {
         mSubscriptions.add(createAddHisObserver(historyItem)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Long>() {
+                .subscribe(new Subscriber<HistoryItem>() {
 
                     @Override
                     public void onCompleted() {
@@ -84,14 +84,14 @@ public class SearchPresenter extends BasePresenter {
                     @Override
                     public void onError(Throwable e) {
                         if(addHistoryCallback != null){
-                            addHistoryCallback.onAddCallBack(null,false);
+                            addHistoryCallback.onAddCallBack(false);
                         }
                     }
 
                     @Override
-                    public void onNext(Long id) {
+                    public void onNext(HistoryItem historyItem) {
                         if(addHistoryCallback != null){
-                            addHistoryCallback.onAddCallBack(id,true);
+                            addHistoryCallback.onAddCallBack(true);
                         }
                     }
                 })
@@ -158,7 +158,7 @@ public class SearchPresenter extends BasePresenter {
                      @Override
                      public void onError(Throwable e) {
                        if(getMyView() != null){
-                           getMyView().setHistorySearchItems(null,false);
+                           getMyView().setHistorySearchItems(new ArrayList<HistoryItem>(),false);
                        }
                      }
 
@@ -196,7 +196,7 @@ public class SearchPresenter extends BasePresenter {
 
     public interface addHistoryCallback{
 
-        void onAddCallBack(Long id,Boolean isOk);
+        void onAddCallBack(Boolean isOk);
 
     }
 
@@ -224,13 +224,15 @@ public class SearchPresenter extends BasePresenter {
      * @param historyItem
      * @return
      */
-    private Observable<Long> createAddHisObserver(final HistoryItem historyItem){
-        return Observable.create(new Observable.OnSubscribe<Long>() {
+    private Observable<HistoryItem> createAddHisObserver(final HistoryItem historyItem){
+        return Observable.create(new Observable.OnSubscribe<HistoryItem>() {
             @Override
-            public void call(Subscriber<? super Long> subscriber) {
+            public void call(Subscriber<? super HistoryItem> subscriber) {
                 HistoryItemDao historyItemDao = GreenDaoManger.getIntance().getmDaoSession().getHistoryItemDao();
-                subscriber.onNext(historyItemDao.insert(historyItem));
-        };
+                long insert = historyItemDao.insert(historyItem);
+                historyItem.setId(insert);
+                subscriber.onNext(historyItem);
+        }
      });
     }
 

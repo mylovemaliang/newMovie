@@ -15,7 +15,7 @@
         <com.zhy.android.percent.support.PercentLinearLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_heightPercent="75%"
+            app:layout_heightPercent="80%"
             app:layout_widthPercent="80%"
             android:orientation="horizontal"
             android:background="@drawable/textborder"
@@ -25,7 +25,7 @@
 
             <RelativeLayout
                 android:layout_width="0dp"
-                app:layout_widthPercent="25%w"
+                app:layout_widthPercent="15%w"
                 android:layout_height="match_parent"
                 android:id="@+id/edit_clear_area">
 
@@ -33,15 +33,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@mipmap/search"
+                    android:id="@+id/head_image"
                     android:layout_centerInParent="true"/>
             </RelativeLayout>
 
             <TextView
                 android:layout_width="0dp"
-                app:layout_widthPercent="75%w"
+                app:layout_widthPercent="85%w"
                 android:layout_height="match_parent"
                 android:background="@null"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:singleLine="true"
                 android:gravity="left|center_vertical"
                 android:hint="搜索或输入网址"
@@ -65,14 +66,14 @@
         android:layout_width="match_parent"
         android:layout_height="3dip"
         android:progressDrawable="@drawable/progressstyle"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
-    <com.tencent.smtt.sdk.WebView
+    <cn.fuyoushuo.vipmovie.view.X5View.X5BridgeWebView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/content_wv"
-        android:layout_below="@+id/progressBar">
-    </com.tencent.smtt.sdk.WebView>
+        android:layout_below="@id/progressBar"
+        android:id="@+id/x5_webview">
+    </cn.fuyoushuo.vipmovie.view.X5View.X5BridgeWebView>
 
     <FrameLayout
         android:id="@+id/videoContainer"

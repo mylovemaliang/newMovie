@@ -3,6 +3,7 @@ package cn.fuyoushuo.vipmovie.view.flagment;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,6 +21,8 @@ import cn.fuyoushuo.vipmovie.view.activity.BaseActivity;
  * Fragment 的基本抽象
  */
 public abstract class BaseFragment extends RxFragment {
+
+    private static final String STATE_SAVE_IS_HIDDEN = "STATE_SAVE_IS_HIDDEN";
 
     protected BaseActivity mactivity;
 
@@ -55,7 +58,23 @@ public abstract class BaseFragment extends RxFragment {
         mAutoBindView = true;
         initData();
         setRetainInstance(false);
+        if (savedInstanceState != null) {
+            boolean isSupportHidden = savedInstanceState.getBoolean(STATE_SAVE_IS_HIDDEN);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            if (isSupportHidden) {
+                ft.hide(this);
+            } else {
+                ft.show(this);
+            }
+            ft.commit();
+        }
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(STATE_SAVE_IS_HIDDEN,isHidden());
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

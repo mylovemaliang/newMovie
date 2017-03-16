@@ -10,15 +10,18 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.jakewharton.rxbinding.view.RxView;
 import com.trello.rxlifecycle.FragmentEvent;
+import com.zhy.android.percent.support.PercentLinearLayout;
 
 import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import cn.fuyoushuo.commonlib.utils.RxBus;
 import cn.fuyoushuo.domain.entity.HistoryItem;
+import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.R;
 import cn.fuyoushuo.vipmovie.ext.FragmentTagGenerator;
 import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
@@ -37,6 +40,21 @@ public class TabFragment extends BaseFragment{
 
     @Bind(R.id.tab_count_area)
     RelativeLayout tabCountArea;
+
+    @Bind(R.id.back_area)
+    RelativeLayout toLeftArea;
+
+    @Bind(R.id.to_right_area)
+    RelativeLayout toRightArea;
+
+    @Bind(R.id.more_area)
+    RelativeLayout menuArea;
+
+    @Bind(R.id.shouye_area)
+    RelativeLayout toMainArea;
+
+    @Bind(R.id.tab_fragment_bottom)
+    PercentLinearLayout bottomTabBar;
 
     private Integer fragmentId;
 
@@ -93,7 +111,7 @@ public class TabFragment extends BaseFragment{
     @Override
     protected void initView() {
         super.initView();
-        mainFragment = MainFragment.newInstance();
+        mainFragment = MainFragment.newInstance(this.fragmentId);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.tab_fragment_area,mainFragment,"main_fragment").show(mainFragment);
         mContent = mainFragment;
@@ -104,6 +122,7 @@ public class TabFragment extends BaseFragment{
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         RxView.clicks(tabCountArea).compose(this.<Void>bindUntilEvent(FragmentEvent.DESTROY_VIEW))
                 .throttleFirst(1000,TimeUnit.MILLISECONDS)
                 .subscribe(new Action1<Void>() {
@@ -115,6 +134,9 @@ public class TabFragment extends BaseFragment{
                                 Log.d("capture callback","success");
                                 SwipeDialogFragment swipeDialogFragment = SwipeDialogFragment.newInstance();
                                 swipeDialogFragment.show(getFragmentManager(),"swipeDialogFragment");
+                                if(contentFragment != null && fragmentManager.findFragmentByTag("content_fragment") != null){
+                                    contentFragment.onSwipeApear();
+                                }
                            }
 
                            @Override
@@ -125,6 +147,61 @@ public class TabFragment extends BaseFragment{
                     }
                 });
 
+        //向左
+        RxView.clicks(toLeftArea).compose(this.<Void>bindUntilEvent(FragmentEvent.DESTROY_VIEW))
+                .throttleFirst(1000,TimeUnit.MILLISECONDS)
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void aVoid) {
+                        if(mContent == mainFragment){
+                            Toast.makeText(MyApplication.getContext(),"not allow to move back",Toast.LENGTH_SHORT).show();
+                        }else{
+                            //进入自身的goback流程
+                            goback();
+                        }
+                    }
+                });
+
+        //向右
+        RxView.clicks(toRightArea).compose(this.<Void>bindUntilEvent(FragmentEvent.DESTROY_VIEW))
+                .throttleFirst(1000,TimeUnit.MILLISECONDS)
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void aVoid) {
+                        goforward();
+                    }
+                });
+
+        //菜单
+        RxView.clicks(menuArea).compose(this.<Void>bindUntilEvent(FragmentEvent.DESTROY_VIEW))
+                .throttleFirst(1000,TimeUnit.MILLISECONDS)
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void aVoid) {
+                        // TODO: 2017/3/15
+                    }
+                });
+
+        RxView.clicks(toMainArea).compose(this.<Void>bindUntilEvent(FragmentEvent.DESTROY_VIEW))
+                .throttleFirst(1000,TimeUnit.MILLISECONDS)
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void aVoid) {
+                        if(mContent != mainFragment){
+                            switchContent(mContent,mainFragment);
+                        }
+                    }
+                });
+
+
+    }
+
+    //当fragment视图回到当前的fragment
+    public void onClickToThisFragment(int fragmentId){
+        if(isDetched || this.fragmentId != fragmentId) return;
+        if(contentFragment != null && mContent == contentFragment && fragmentManager.findFragmentByTag("content_fragment") != null){
+             contentFragment.onSwipeDiss();
+        }
     }
 
 
@@ -147,40 +224,45 @@ public class TabFragment extends BaseFragment{
     private void initBusEvent(){
         mSubscriptions.add(RxBus.getInstance().toObserverable().compose(this.<RxBus.BusEvent>bindToLifecycle()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<RxBus.BusEvent>() {
             @Override
-            public void onCompleted() {
+            public void onCompleted() {}
 
-                }
+            @Override
+            public void onError(Throwable e) {
+                return;
+            }
 
-                @Override
-                public void onError(Throwable e) {
-                    return;
-                }
+            @Override
+            public void onNext(RxBus.BusEvent busEvent) {
 
-                @Override
-                public void onNext(RxBus.BusEvent busEvent) {
-                    if(busEvent instanceof MainFragment.toContentViewEvent){
-                        //替换子fragment,这里需要新建fragment,不能使用hide,show
-                        MainFragment.toContentViewEvent event = (MainFragment.toContentViewEvent) busEvent;
-                        final String url = event.getNewItem().getNewUrl();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                handCommonToContentEvent(url);
-                            }
-                        },200);
-                        return;
-                }
-                else if(busEvent instanceof SearchDialogFragment.toContentPageFromSearchEvent){
-                    SearchDialogFragment.toContentPageFromSearchEvent event = (SearchDialogFragment.toContentPageFromSearchEvent) busEvent;
-                    final HistoryItem historyItem = event.getHistoryItem();
+            if(busEvent instanceof MainFragment.toContentViewEvent){
+
+                    //替换子fragment,这里需要新建fragment,不能使用hide,show
+                    MainFragment.toContentViewEvent event = (MainFragment.toContentViewEvent) busEvent;
+                    final String url = event.getNewItem().getNewUrl();
+                    int parentFragmentId = event.getParentFragmentId();
+                    if(parentFragmentId != fragmentId) return;
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            handToContentEvent(historyItem);
+                            handCommonToContentEvent(url);
                         }
                     },200);
                     return;
-                }
+            }
+            else if(busEvent instanceof SearchDialogFragment.toContentPageFromSearchEvent){
+                SearchDialogFragment.toContentPageFromSearchEvent event = (SearchDialogFragment.toContentPageFromSearchEvent) busEvent;
+                final HistoryItem historyItem = event.getHistoryItem();
+                int parentFragmentId = event.getParentFragmentId();
+                if(parentFragmentId != fragmentId) return;
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        handToContentEvent(historyItem);
+                    }
+                },200);
+                return;
+            }
+
             }
         }));
     }
@@ -191,7 +273,7 @@ public class TabFragment extends BaseFragment{
             fragmentTransaction.remove(contentFragment);
         }
         LoadItem loadItem = new LoadItem(1,url,null).bindId(-1l);
-        ContentFragment contentFragment = ContentFragment.newInstance(loadItem);
+        ContentFragment contentFragment = ContentFragment.newInstance(this.fragmentId,loadItem);
         this.contentFragment = contentFragment;
         fragmentTransaction.hide(mainFragment).add(R.id.tab_fragment_area,contentFragment,"content_fragment");
         mContent = this.contentFragment;
@@ -209,7 +291,7 @@ public class TabFragment extends BaseFragment{
             Long id = historyItem.getId();
             String historyUrl = historyItem.getHistoryUrl();
             LoadItem loadItem = new LoadItem(2,historyUrl,null).bindId(id);
-            ContentFragment contentFragment = ContentFragment.newInstance(loadItem);
+            ContentFragment contentFragment = ContentFragment.newInstance(this.fragmentId,loadItem);
             this.contentFragment = contentFragment;
             fragmentTransaction.hide(mainFragment).add(R.id.tab_fragment_area,contentFragment,"content_fragment");
             mContent = this.contentFragment;
@@ -218,13 +300,23 @@ public class TabFragment extends BaseFragment{
             Long id = historyItem.getId();
             String keyword = historyItem.getHistoryTitle();
             LoadItem loadItem = new LoadItem(3,null,keyword).bindId(id);
-            ContentFragment contentFragment = ContentFragment.newInstance(loadItem);
+            ContentFragment contentFragment = ContentFragment.newInstance(this.fragmentId,loadItem);
             this.contentFragment = contentFragment;
             fragmentTransaction.hide(mainFragment).add(R.id.tab_fragment_area,contentFragment,"content_fragment");
             mContent = this.contentFragment;
         }
         fragmentTransaction.commitAllowingStateLoss();
         fragmentManager.executePendingTransactions();
+    }
+
+    //隐藏底部工具栏
+    public void hideBottomBar(){
+        bottomTabBar.setVisibility(View.GONE);
+    }
+
+    //显示底部工具栏
+    public void showBottomeBar(){
+        bottomTabBar.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -234,8 +326,8 @@ public class TabFragment extends BaseFragment{
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
     }
 
     /**
@@ -258,6 +350,24 @@ public class TabFragment extends BaseFragment{
             isGobackDone = false;
         }
         return isGobackDone;
+    }
+
+    /**
+     * fragment 进行向前操作
+     */
+    public void goforward(){
+       if(mContent == mainFragment && contentFragment == null){
+            Toast.makeText(MyApplication.getContext(),"not allow to move forward",Toast.LENGTH_SHORT).show();
+       }
+       else if(mContent == mainFragment && contentFragment != null && fragmentManager.findFragmentByTag("content_fragment") != null){
+            switchContent(mContent,contentFragment);
+       }
+       else if(mContent != null && mContent == contentFragment){
+           boolean result = contentFragment.goForward();
+           if(!result){
+             Toast.makeText(MyApplication.getContext(),"not allow to move forward",Toast.LENGTH_SHORT).show();
+           }
+       }
     }
 
     public static TabFragment newInstance(Integer fragmentId) {

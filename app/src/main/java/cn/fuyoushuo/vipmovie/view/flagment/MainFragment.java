@@ -1,5 +1,6 @@
 package cn.fuyoushuo.vipmovie.view.flagment;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.NestedScrollView;
@@ -77,6 +78,9 @@ public class MainFragment extends BaseFragment implements IMainView{
     @Bind(R.id.main_bottomRcycleView)
     RecyclerView myRecycleView;
 
+    @Bind(R.id.head_mingyan)
+    TextView mingyanText;
+
     private int titleAreaHeight;
 
     private int topAreaHeight;
@@ -96,6 +100,8 @@ public class MainFragment extends BaseFragment implements IMainView{
 
     SiteItemAdapter siteItemAdapter;
 
+    private int parentFragmentId;
+
     @Override
     protected String getPageName() {
         return "main_fragment_page";
@@ -108,7 +114,10 @@ public class MainFragment extends BaseFragment implements IMainView{
 
     @Override
     protected void initData() {
-       mainPresenter = new MainPresenter(this);
+        mainPresenter = new MainPresenter(this);
+        if(getArguments() != null){
+           this.parentFragmentId = getArguments().getInt("parentFragmentId",-1);
+        }
     }
 
     @Override
@@ -248,7 +257,7 @@ public class MainFragment extends BaseFragment implements IMainView{
 
               @Override
               public void onClickNews(NewItem newItem) {
-                   RxBus.getInstance().send(new toContentViewEvent(newItem));
+                   RxBus.getInstance().send(new toContentViewEvent(newItem,parentFragmentId));
               }
           });
           myRecycleView.setHasFixedSize(true);
@@ -269,6 +278,15 @@ public class MainFragment extends BaseFragment implements IMainView{
           siteRview.setNestedScrollingEnabled(true);
           siteRview.setAdapter(siteItemAdapter);
 
+          //设置首页字体
+          initMingyanFront();
+
+    }
+
+    //初始化字体图标
+    private void initMingyanFront() {
+        Typeface typeface = Typeface.createFromAsset(getActivity().getAssets(),"ziti/huawenxingkai.ttf");
+        mingyanText.setTypeface(typeface);
     }
 
     @Override
@@ -286,7 +304,7 @@ public class MainFragment extends BaseFragment implements IMainView{
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        SearchDialogFragment.newInstance().show(getFragmentManager(),"SearchDialogFragment");
+                        SearchDialogFragment.newInstance(parentFragmentId).show(getFragmentManager(),"SearchDialogFragment");
                     }
                 });
     }
@@ -327,10 +345,10 @@ public class MainFragment extends BaseFragment implements IMainView{
         }
     }
 
-    public static MainFragment newInstance() {
+    public static MainFragment newInstance(int parentFragmentId) {
         
         Bundle args = new Bundle();
-        
+        args.putInt("parentFragmentId",parentFragmentId);
         MainFragment fragment = new MainFragment();
         fragment.setArguments(args);
         return fragment;
@@ -400,8 +418,11 @@ public class MainFragment extends BaseFragment implements IMainView{
 
       private NewItem newItem;
 
-      public toContentViewEvent(NewItem newItem) {
+      private int parentFragmentId;
+
+      public toContentViewEvent(NewItem newItem, int parentFragmentId) {
           this.newItem = newItem;
+          this.parentFragmentId = parentFragmentId;
       }
 
       public NewItem getNewItem() {
@@ -411,5 +432,13 @@ public class MainFragment extends BaseFragment implements IMainView{
       public void setNewItem(NewItem newItem) {
           this.newItem = newItem;
       }
-   }
+
+      public int getParentFragmentId() {
+          return parentFragmentId;
+      }
+
+      public void setParentFragmentId(int parentFragmentId) {
+          this.parentFragmentId = parentFragmentId;
+      }
+  }
 }

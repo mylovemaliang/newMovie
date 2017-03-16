@@ -1,9 +1,11 @@
 package cn.fuyoushuo.vipmovie.view.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
@@ -14,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import cn.fuyoushuo.commonlib.utils.CommonUtils;
 import cn.fuyoushuo.domain.entity.HistoryItem;
 import cn.fuyoushuo.domain.entity.NewType;
 import cn.fuyoushuo.vipmovie.MyApplication;
@@ -49,12 +52,24 @@ public class SearchHisAdapter extends BaseListAdapter<HistoryItem>{
                 onHisClick.onClick(currentHolder.itemView, item);
             }
         });
-        currentHolder.hisText.setText(item.getHistoryTitle());
+        int historyType = item.getHistoryType();
+        if(historyType == 1){
+          currentHolder.headImage.setImageResource(R.mipmap.site);
+        }else{
+          currentHolder.headImage.setImageResource(R.mipmap.search_word);
+        }
+        String historyTitle = item.getHistoryTitle();
+        if(!TextUtils.isEmpty(historyTitle) && !historyTitle.startsWith("http")){
+             historyTitle = CommonUtils.getShortTitle(historyTitle);
+        }
+        currentHolder.hisText.setText(historyTitle);
     }
 
     public class ItemViewHolder extends RecyclerView.ViewHolder{
 
-        @Bind(R.id.search_item_text) public TextView hisText;
+        @Bind(R.id.search_item_text) TextView hisText;
+
+        @Bind(R.id.head_image) ImageView headImage;
 
         public ItemViewHolder(final View itemView) {
             super(itemView);

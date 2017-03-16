@@ -1,5 +1,6 @@
 package cn.fuyoushuo.vipmovie.view.activity;
 
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TabLayout;
@@ -46,6 +47,7 @@ public class MainActivity extends BaseActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().setFormat(PixelFormat.TRANSLUCENT);
         fragmentManager = getSupportFragmentManager();
         mSubscriptions = new CompositeSubscription();
         initFragment();
@@ -105,7 +107,8 @@ public class MainActivity extends BaseActivity{
     public void clickTab(TabItem tabItem){
         Integer fragmentId = tabItem.getFragmentId();
         String fragmentTag = tabItem.getFragmentTag();
-        Fragment fragmentByTag = fragmentManager.findFragmentByTag(fragmentTag);
+        TabFragment fragmentByTag = (TabFragment) fragmentManager.findFragmentByTag(fragmentTag);
+        fragmentByTag.onClickToThisFragment(fragmentId);
         if(!(fragmentByTag == mContent)) {
            LocalFragmentManger.getIntance().setCurrentId(fragmentId);
            switchContent(mContent,fragmentByTag,"");
@@ -126,7 +129,8 @@ public class MainActivity extends BaseActivity{
         if(deleteFragment == mContent){
             TabItem firstFragment = LocalFragmentManger.getIntance().getFirstFragment();
             String headFragmentTag = firstFragment.getFragmentTag();
-            Fragment headFragmentByTag = fragmentManager.findFragmentByTag(headFragmentTag);
+            TabFragment headFragmentByTag = (TabFragment) fragmentManager.findFragmentByTag(headFragmentTag);
+            headFragmentByTag.onClickToThisFragment(firstFragment.getFragmentId());
             switchContent(mContent,headFragmentByTag,"");
             LocalFragmentManger.getIntance().setCurrentId(firstFragment.getFragmentId());
             fragmentTransaction.remove(deleteFragment);

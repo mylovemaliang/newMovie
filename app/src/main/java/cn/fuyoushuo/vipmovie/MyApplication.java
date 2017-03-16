@@ -66,7 +66,7 @@ public class MyApplication extends Application{
         LocalFragmentManger.getIntance().initContext(context);
         GreenDaoManger.getIntance().initContext(context);
         GreenDaoManger.getIntance().initDatabase();
-        Stetho.initializeWithDefaults(this);
+//        Stetho.initializeWithDefaults(this);
         new OkHttpClient.Builder()
                 .addNetworkInterceptor(new StethoInterceptor())
                 .build();

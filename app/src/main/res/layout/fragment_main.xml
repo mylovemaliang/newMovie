@@ -26,6 +26,15 @@
                             android:src="@mipmap/backgroud"
                             android:id="@+id/topImage"/>
 
+                        <TextView
+                            android:id="@+id/head_mingyan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="25dp"
+                            android:layout_marginTop="35dp"
+                            android:textSize="17sp"
+                            android:text="真理惟一可靠的标准就是永远自相符合." />
+
                         <com.zhy.android.percent.support.PercentRelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="60dp"
@@ -86,12 +95,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <com.zhy.android.percent.support.PercentRelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:id="@+id/title_ess_container"/>
+         <com.zhy.android.percent.support.PercentRelativeLayout
+                 android:layout_width="match_parent"
+                 android:layout_height="60dp"
+                 android:id="@+id/title_ess_container"/>
 
-        <LinearLayout
+         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:id="@+id/top_ess_container"

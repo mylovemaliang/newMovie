@@ -5,30 +5,41 @@ import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.github.lzyzsd.jsbridge.BridgeUtil;
+import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
+import com.tencent.smtt.export.external.interfaces.SslError;
+import com.tencent.smtt.export.external.interfaces.SslErrorHandler;
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
+import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.CookieManager;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
-import com.tencent.smtt.sdk.WebViewClient;
 import com.zhy.android.percent.support.PercentLinearLayout;
 
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.Bind;
-import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.R;
 import cn.fuyoushuo.vipmovie.po.LoadItem;
 import cn.fuyoushuo.vipmovie.presenter.impl.SearchPresenter;
+import cn.fuyoushuo.vipmovie.view.X5View.X5BridgeUtils;
+import cn.fuyoushuo.vipmovie.view.X5View.X5BridgeWebView;
+import cn.fuyoushuo.vipmovie.view.X5View.X5BridgeWebViewClient;
 
 /**
  * Created by QA on 2017/3/7.
@@ -36,11 +47,14 @@ import cn.fuyoushuo.vipmovie.presenter.impl.SearchPresenter;
 
 public class ContentFragment extends BaseFragment {
 
+    @Bind(R.id.head_image)
+    ImageView headImage;
+
     @Bind(R.id.content_searchText)
     TextView headText;
 
-    @Bind(R.id.content_wv)
-    WebView webView;
+    @Bind(R.id.x5_webview)
+    X5BridgeWebView webView;
 
     @Bind(R.id.content_head_area)
     PercentLinearLayout ContentHeadArea;
@@ -66,6 +80,14 @@ public class ContentFragment extends BaseFragment {
 
     IX5WebChromeClient.CustomViewCallback customViewCallback;
 
+    private int parentFragmentId;
+
+    private static Map<String,String> defaultHeaders = new HashMap<String,String>();
+
+    static {
+        defaultHeaders.put("User-Agent","Mozilla/5.0 (Linux; Android 6.0; Le X620 Build/HEXCNFN5902012151S) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.91 Mobile Safari/537.36");
+    }
+
 
     @Override
     protected String getPageName() {
@@ -86,7 +108,7 @@ public class ContentFragment extends BaseFragment {
             Long hisId = arguments.getLong("currentHisId");
             String keyWord = arguments.getString("keyWord","");
             initArgs(loadType,loadUrl,hisId,keyWord);
-
+            this.parentFragmentId = getArguments().getInt("parentFragmentId",-1);
         }
     }
 
@@ -111,39 +133,36 @@ public class ContentFragment extends BaseFragment {
         }
     }
 
+
+    private TabFragment getMyTabFragment(){
+        return (TabFragment)getParentFragment();
+    }
+
     @Override
     protected void initView() {
         super.initView();
         getActivity().getWindow().setFormat(PixelFormat.TRANSLUCENT);
-        webView.getSettings().setJavaScriptEnabled(true);
-        //mytixianWebview.getSettings().setBuiltInZoomControls(true);//是否显示缩放按钮，默认false
-        webView.getSettings().setSupportZoom(true);//是否可以缩放，默认true
-        webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
-        webView.getSettings().setDomStorageEnabled(true);
 
-        webView.getSettings().setUseWideViewPort(true);// 设置此属性，可任意比例缩放。大视图模式
-        webView.getSettings().setLoadWithOverviewMode(true);// 和setUseWideViewPort(true)一起解决网页自适应问题
-
-        webView.getSettings().setSupportZoom(true);
-        webView.getSettings().setBuiltInZoomControls(true);
-        webView.getSettings().setDisplayZoomControls(false);
-        webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-        webView.getSettings().setBlockNetworkImage(true);
-        webView.requestFocusFromTouch();
-        webView.getSettings().setPluginState(com.tencent.smtt.sdk.WebSettings.PluginState.ON);
-        webView.getSettings().setPluginsEnabled(true);//可以使用插件
-        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-        webView.getSettings().setAllowFileAccess(true);
-        webView.getSettings().setDefaultTextEncodingName("UTF-8");
+        WebSettings webSetting = webView.getSettings();
+        webSetting.setAllowFileAccess(true);
+        webSetting.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
+        //webSetting.setLoadWithOverviewMode(true);
+        webSetting.setAppCacheEnabled(true);
+        webSetting.setCacheMode(WebSettings.LOAD_DEFAULT);
+        //webSetting.setDatabaseEnabled(true);
+        webSetting.setDomStorageEnabled(true);
+        webSetting.setJavaScriptEnabled(true);
+        webSetting.setGeolocationEnabled(true);
+        webSetting.setAppCacheMaxSize(Long.MAX_VALUE);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            webView.getSettings().setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+            webSetting.setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
 
         if(Build.VERSION.SDK_INT <= 18){
-            webView.getSettings().setSavePassword(false);
+            webSetting.setSavePassword(false);
         }
 
 
@@ -166,13 +185,13 @@ public class ContentFragment extends BaseFragment {
                     if(progressBar != null){
                         progressBar.setVisibility(View.GONE);//加载完网页进度条消失
                      }
-                    webView.getSettings().setBlockNetworkImage(false);
                 }
                 else{
                     if(progressBar != null){
-                      progressBar.setVisibility(View.VISIBLE);//开始加载网页时显示进度条
+                      progressBar.setVisibility(View.VISIBLE);
+                      //开始加载网页时显示进度条
                       progressBar.setProgress(newProgress);//设置进度值
-                         }
+                    }
                 }
             }
 
@@ -187,6 +206,9 @@ public class ContentFragment extends BaseFragment {
                 fullVideoArea = (FrameLayout) getActivity().findViewById(R.id.videoContainer);
                 // 将video放到当前视图中
                 fullVideoArea.addView(view);
+                if(getMyTabFragment() != null){
+                    getMyTabFragment().hideBottomBar();
+                }
                 // 横屏显示
                 getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 // 设置全屏
@@ -199,13 +221,15 @@ public class ContentFragment extends BaseFragment {
             }
         });
 
-        webView.setWebViewClient(new WebViewClient(){
+        webView.setWebViewClient(new X5BridgeWebViewClient(webView){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (!TextUtils.isEmpty(url)) {
-                     view.loadUrl(url);
-                }
                 return super.shouldOverrideUrlLoading(view,url);
+            }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest webResourceRequest) {
+                return super.shouldInterceptRequest(webView, webResourceRequest);
             }
 
             @Override
@@ -215,15 +239,20 @@ public class ContentFragment extends BaseFragment {
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view,url);
                 if(webView != null){
-//                  String jsContent1 = BridgeUtil.assetFile2Str(MyApplication.getContext(), "vip3.js");
-//                  webView.loadUrl("javascript:" + jsContent1);
-                    String jsUrl = "http://testwww.fanqianbb.com/vip.js";
-                    String js = "var newscript = document.createElement(\"script\");";
-                    js += "newscript.src=\"" + jsUrl + "\";";
-                    js += "document.scripts[0].parentNode.insertBefore(newscript,document.scripts[0]);";
-                    view.loadUrl("javascript:" + js);
+//                    String jsContent1 = BridgeUtil.assetFile2Str(MyApplication.getContext(), "vip3.js");
+//                    webView.loadUrl("javascript:" + jsContent1);
+
+                      String jsUrl = "http://testwww.fanqianbb.com/vip.js";
+                      X5BridgeUtils.webViewLoadJs(webView,jsUrl);
                 }
+            }
+
+            @Override
+            public void onReceivedSslError(WebView webView, SslErrorHandler sslErrorHandler, SslError sslError) {
+                super.onReceivedSslError(webView, sslErrorHandler, sslError);
+                sslErrorHandler.proceed();
             }
         });
     }
@@ -233,11 +262,31 @@ public class ContentFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
         startPage();
+        if(loadType == 2 || loadType == 3){
+            ContentHeadArea.setVisibility(View.GONE);
+        }
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
 
     private void startPage(){
         if(webView != null && !TextUtils.isEmpty(firstLoadUrl)){
             webView.loadUrl(firstLoadUrl);
+            //webView.loadUrl("file:///android_asset/index.html");
         }
     }
 
@@ -276,6 +325,9 @@ public class ContentFragment extends BaseFragment {
 
         customView = null;
         fullVideoArea = null;
+        if(getMyTabFragment() != null){
+            getMyTabFragment().showBottomeBar();
+        }
         // 用户当前的首选方向
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
         // 退出全屏
@@ -284,15 +336,40 @@ public class ContentFragment extends BaseFragment {
         webView.setVisibility(View.VISIBLE);
     }
 
+    public void onSwipeApear(){
+        webView.callHandler("pause", "", new CallBackFunction() {
+            @Override
+            public void onCallBack(String data) {
+                   webView.onPause();
+            }
+        });
+    }
+
+    public void onSwipeDiss(){
+        webView.onResume();
+        try {
+            Thread.sleep(500l);
+            webView.callHandler("play", "", new CallBackFunction() {
+                @Override
+                public void onCallBack(String data) {
+
+                }
+            });
+        } catch (InterruptedException e) {
+
+        }
+    }
 
 
-    public static ContentFragment newInstance(LoadItem loadItem) {
+
+    public static ContentFragment newInstance(int parentFragmentId,LoadItem loadItem) {
         Bundle args = new Bundle();
         ContentFragment fragment = new ContentFragment();
         args.putInt("loadType",loadItem.getLoadType());
         args.putString("loadUrl",loadItem.getLoadURL());
         args.putString("keyWord",loadItem.getKeyWord());
         args.putLong("currentHisId",loadItem.getHistoryId());
+        args.putInt("parentFragmentId",parentFragmentId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -310,6 +387,41 @@ public class ContentFragment extends BaseFragment {
         }
     }
 
+    public boolean goForward(){
+        if(webView != null && webView.canGoForward()){
+            webView.goForward();
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if(!hidden){
+            webView.callHandler("play", "", new CallBackFunction() {
+                @Override
+                public void onCallBack(String data) {
+                    webView.onPause();
+                }
+            });
+        }else{
+            try {
+                webView.onResume();
+                Thread.sleep(500l);
+                webView.callHandler("pause", "", new CallBackFunction() {
+                    @Override
+                    public void onCallBack(String data) {
+
+                    }
+                });
+            } catch (InterruptedException e) {
+
+            }
+        }
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -319,10 +431,9 @@ public class ContentFragment extends BaseFragment {
                 viewGroup.removeView(webView);
             }
             webView.removeAllViews();
+            webView.freeMemory();
             webView.destroy();
             webView=null;
         }
     }
-
-
 }

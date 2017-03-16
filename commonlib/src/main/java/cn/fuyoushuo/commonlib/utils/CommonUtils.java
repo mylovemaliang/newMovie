@@ -22,7 +22,7 @@ public class CommonUtils {
         if(title.length() <= 10){
             return title;
         }
-        return title.substring(0,10);
+        return title.substring(0,10)+"...";
     }
 
     /**

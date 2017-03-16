@@ -1,5 +1,6 @@
 package cn.fuyoushuo.vipmovie.view.flagment;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -107,6 +108,11 @@ public class SwipeDialogFragment extends RxDialogFragment {
                          dismissAllowingStateLoss();
                     }
                 });
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
     }
 
     @Override

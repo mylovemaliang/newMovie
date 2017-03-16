@@ -7,7 +7,7 @@
     <com.zhy.android.percent.support.PercentRelativeLayout
         android:id="@+id/search_prompt_flagment_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         android:background="@android:color/white"
         android:elevation="4dp">
 
