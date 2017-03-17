@@ -28,7 +28,8 @@ public class HistoryItemDao extends AbstractDao<HistoryItem, Long> {
         public final static Property HistoryTitle = new Property(1, String.class, "historyTitle", false, "HISTORY_TITLE");
         public final static Property HistoryUrl = new Property(2, String.class, "historyUrl", false, "HISTORY_URL");
         public final static Property HistoryType = new Property(3, int.class, "historyType", false, "HISTORY_TYPE");
-        public final static Property CreateTime = new Property(4, java.util.Date.class, "createTime", false, "CREATE_TIME");
+        public final static Property InputMd5 = new Property(4, String.class, "inputMd5", false, "INPUT_MD5");
+        public final static Property CreateTime = new Property(5, java.util.Date.class, "createTime", false, "CREATE_TIME");
     }
 
 
@@ -48,7 +49,8 @@ public class HistoryItemDao extends AbstractDao<HistoryItem, Long> {
                 "\"HISTORY_TITLE\" TEXT," + // 1: historyTitle
                 "\"HISTORY_URL\" TEXT," + // 2: historyUrl
                 "\"HISTORY_TYPE\" INTEGER NOT NULL ," + // 3: historyType
-                "\"CREATE_TIME\" INTEGER);"); // 4: createTime
+                "\"INPUT_MD5\" TEXT," + // 4: inputMd5
+                "\"CREATE_TIME\" INTEGER);"); // 5: createTime
     }
 
     /** Drops the underlying database table. */
@@ -77,9 +79,14 @@ public class HistoryItemDao extends AbstractDao<HistoryItem, Long> {
         }
         stmt.bindLong(4, entity.getHistoryType());
  
+        String inputMd5 = entity.getInputMd5();
+        if (inputMd5 != null) {
+            stmt.bindString(5, inputMd5);
+        }
+ 
         java.util.Date createTime = entity.getCreateTime();
         if (createTime != null) {
-            stmt.bindLong(5, createTime.getTime());
+            stmt.bindLong(6, createTime.getTime());
         }
     }
 
@@ -103,9 +110,14 @@ public class HistoryItemDao extends AbstractDao<HistoryItem, Long> {
         }
         stmt.bindLong(4, entity.getHistoryType());
  
+        String inputMd5 = entity.getInputMd5();
+        if (inputMd5 != null) {
+            stmt.bindString(5, inputMd5);
+        }
+ 
         java.util.Date createTime = entity.getCreateTime();
         if (createTime != null) {
-            stmt.bindLong(5, createTime.getTime());
+            stmt.bindLong(6, createTime.getTime());
         }
     }
 
@@ -121,7 +133,8 @@ public class HistoryItemDao extends AbstractDao<HistoryItem, Long> {
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // historyTitle
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // historyUrl
             cursor.getInt(offset + 3), // historyType
-            cursor.isNull(offset + 4) ? null : new java.util.Date(cursor.getLong(offset + 4)) // createTime
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // inputMd5
+            cursor.isNull(offset + 5) ? null : new java.util.Date(cursor.getLong(offset + 5)) // createTime
         );
         return entity;
     }
@@ -132,7 +145,8 @@ public class HistoryItemDao extends AbstractDao<HistoryItem, Long> {
         entity.setHistoryTitle(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setHistoryUrl(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setHistoryType(cursor.getInt(offset + 3));
-        entity.setCreateTime(cursor.isNull(offset + 4) ? null : new java.util.Date(cursor.getLong(offset + 4)));
+        entity.setInputMd5(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setCreateTime(cursor.isNull(offset + 5) ? null : new java.util.Date(cursor.getLong(offset + 5)));
      }
     
     @Override

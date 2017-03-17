@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import cn.fuyoushuo.commonlib.utils.MD5;
 import cn.fuyoushuo.commonlib.utils.RegexUtils;
 import cn.fuyoushuo.commonlib.utils.RxBus;
 import cn.fuyoushuo.domain.entity.HistoryItem;
@@ -76,6 +77,8 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
     private String input = "";
 
     private int parentFragmentId;
+
+    Handler handler = new Handler();
 
 
     @Override
@@ -121,7 +124,21 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
         searchHisAdapter.setOnHisClick(new SearchHisAdapter.OnHisClick() {
             @Override
             public void onClick(View view, HistoryItem typeItem) {
-                // TODO: 2017/3/10
+                // 点击历史记录
+                searchPresenter.addHistory(typeItem, new SearchPresenter.addHistoryCallback() {
+                    @Override
+                    public void onAddCallBack(Boolean isOk) {}
+                });
+                RxBus.getInstance().send(new toContentPageFromSearchEvent(typeItem,parentFragmentId));
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (inputManager.isActive()) {
+                            inputManager.hideSoftInputFromWindow(searchEditText.getApplicationWindowToken(), 0);
+                        }
+                       dismissAllowingStateLoss();
+                    }
+                },300);
             }
         });
         resultRview.setHasFixedSize(true);
@@ -196,8 +213,12 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
                         }else{
                             HistoryItem historyItem = handlerAddSearch();
                             RxBus.getInstance().send(new toContentPageFromSearchEvent(historyItem,parentFragmentId));
-                            dismissAllowingStateLoss();
-                            // TODO: 2017/3/10
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    dismissAllowingStateLoss();
+                                }
+                                },300);
                         }
                     }
                 });
@@ -218,8 +239,12 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
                     }else{
                         HistoryItem historyItem = handlerAddSearch();
                         RxBus.getInstance().send(new toContentPageFromSearchEvent(historyItem,parentFragmentId));
-                        dismissAllowingStateLoss();
-                        // TODO: 2017/3/10
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                dismissAllowingStateLoss();
+                            }
+                        },200);
                     }
                 }
 //                if(keyCode == KeyEvent.KEYCODE_DEL && event.getAction() == KeyEvent.ACTION_DOWN){
@@ -239,6 +264,7 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
     private HistoryItem handlerAddSearch(){
         boolean isUrl = false;
         String result = input;
+        String inputMd5 = MD5.MD5Encode(result);
         final HistoryItem historyItem = new HistoryItem();
         if(!result.startsWith("http://") && !result.startsWith("https://")){
             result = "http://"+result;
@@ -249,10 +275,12 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
             historyItem.setHistoryType(1);
             historyItem.setHistoryTitle(result);
             historyItem.setCreateTime(new Date());
+            historyItem.setInputMd5(inputMd5);
         }else{
             historyItem.setHistoryType(2);
             historyItem.setHistoryTitle(input);
             historyItem.setCreateTime(new Date());
+            historyItem.setInputMd5(inputMd5);
         }
         if(searchPresenter != null){
             searchPresenter.addHistory(historyItem, new SearchPresenter.addHistoryCallback() {

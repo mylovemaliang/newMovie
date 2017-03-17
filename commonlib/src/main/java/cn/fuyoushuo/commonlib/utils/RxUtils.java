@@ -12,7 +12,7 @@ import rx.subscriptions.CompositeSubscription;
  * @Date 2016-01-11 14:22
  * @Version 1.0
  */
-public class RxUtils {
+public class  RxUtils {
 
     public static void unsubscribeIfNotNull(Subscription subscription) {
         if (subscription != null) {

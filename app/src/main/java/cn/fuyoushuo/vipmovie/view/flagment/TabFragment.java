@@ -246,7 +246,7 @@ public class TabFragment extends BaseFragment{
                         public void run() {
                             handCommonToContentEvent(url);
                         }
-                    },200);
+                    },100);
                     return;
             }
             else if(busEvent instanceof SearchDialogFragment.toContentPageFromSearchEvent){
@@ -259,7 +259,7 @@ public class TabFragment extends BaseFragment{
                     public void run() {
                         handToContentEvent(historyItem);
                     }
-                },200);
+                },100);
                 return;
             }
 

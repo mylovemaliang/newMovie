@@ -9,6 +9,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.fuyoushuo.commonlib.utils.MD5;
 import cn.fuyoushuo.domain.entity.HistoryItem;
 import cn.fuyoushuo.domain.greendao.HistoryItemDao;
 import cn.fuyoushuo.domain.httpservice.BaiduHttpService;
@@ -179,6 +180,7 @@ public class SearchPresenter extends BasePresenter {
                                  HistoryItem historyItem = new HistoryItem();
                                  historyItem.setHistoryTitle(item1);
                                  historyItem.setHistoryType(2);
+                                 historyItem.setInputMd5(MD5.MD5Encode(item1));
                                  resultList.add(historyItem);
                              }
                          }
@@ -229,10 +231,18 @@ public class SearchPresenter extends BasePresenter {
             @Override
             public void call(Subscriber<? super HistoryItem> subscriber) {
                 HistoryItemDao historyItemDao = GreenDaoManger.getIntance().getmDaoSession().getHistoryItemDao();
+                //删除旧的相同的历史记录
+                historyItemDao.queryBuilder().where(HistoryItemDao.Properties.InputMd5.eq(historyItem.getInputMd5())).buildDelete().executeDeleteWithoutDetachingEntities();
+                long count = historyItemDao.count();
+                if(count >= 20){
+                    //删除最旧的历史记录
+                    historyItemDao.queryBuilder().orderAsc(HistoryItemDao.Properties.Id).limit(1).buildDelete().executeDeleteWithoutDetachingEntities();
+                }
                 long insert = historyItemDao.insert(historyItem);
                 historyItem.setId(insert);
                 subscriber.onNext(historyItem);
-        }
+            }
+
      });
     }
 

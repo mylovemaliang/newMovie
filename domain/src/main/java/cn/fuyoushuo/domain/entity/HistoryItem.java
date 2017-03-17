@@ -24,15 +24,19 @@ public class HistoryItem {
      */
     private int historyType;
 
+    //用户输入搜索的MD5值
+    private String inputMd5;
+
     private Date createTime;
 
-    @Generated(hash = 1167322814)
+    @Generated(hash = 971693790)
     public HistoryItem(Long id, String historyTitle, String historyUrl,
-            int historyType, Date createTime) {
+            int historyType, String inputMd5, Date createTime) {
         this.id = id;
         this.historyTitle = historyTitle;
         this.historyUrl = historyUrl;
         this.historyType = historyType;
+        this.inputMd5 = inputMd5;
         this.createTime = createTime;
     }
 
@@ -72,6 +76,14 @@ public class HistoryItem {
         this.historyType = historyType;
     }
 
+    public String getInputMd5() {
+        return this.inputMd5;
+    }
+
+    public void setInputMd5(String inputMd5) {
+        this.inputMd5 = inputMd5;
+    }
+
     public Date getCreateTime() {
         return this.createTime;
     }
@@ -79,5 +91,6 @@ public class HistoryItem {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
+
 
 }

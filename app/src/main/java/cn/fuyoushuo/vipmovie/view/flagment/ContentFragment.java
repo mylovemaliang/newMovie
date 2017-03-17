@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.github.lzyzsd.jsbridge.CallBackFunction;
+import com.jakewharton.rxbinding.view.RxView;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
 import com.tencent.smtt.export.external.interfaces.SslError;
 import com.tencent.smtt.export.external.interfaces.SslErrorHandler;
@@ -27,19 +28,23 @@ import com.tencent.smtt.sdk.CookieManager;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
+import com.trello.rxlifecycle.FragmentEvent;
 import com.zhy.android.percent.support.PercentLinearLayout;
 
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
+import cn.fuyoushuo.commonlib.utils.RxBus;
 import cn.fuyoushuo.vipmovie.R;
 import cn.fuyoushuo.vipmovie.po.LoadItem;
 import cn.fuyoushuo.vipmovie.presenter.impl.SearchPresenter;
 import cn.fuyoushuo.vipmovie.view.X5View.X5BridgeUtils;
 import cn.fuyoushuo.vipmovie.view.X5View.X5BridgeWebView;
 import cn.fuyoushuo.vipmovie.view.X5View.X5BridgeWebViewClient;
+import rx.functions.Action1;
 
 /**
  * Created by QA on 2017/3/7.
@@ -58,6 +63,9 @@ public class ContentFragment extends BaseFragment {
 
     @Bind(R.id.content_head_area)
     PercentLinearLayout ContentHeadArea;
+
+    @Bind(R.id.search_head_area)
+    PercentLinearLayout searchHeadArea;
 
     @Bind(R.id.progressBar)
     ProgressBar progressBar;
@@ -143,7 +151,7 @@ public class ContentFragment extends BaseFragment {
         super.initView();
         getActivity().getWindow().setFormat(PixelFormat.TRANSLUCENT);
 
-        WebSettings webSetting = webView.getSettings();
+        final WebSettings webSetting = webView.getSettings();
         webSetting.setAllowFileAccess(true);
         webSetting.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         //webSetting.setLoadWithOverviewMode(true);
@@ -255,7 +263,27 @@ public class ContentFragment extends BaseFragment {
                 sslErrorHandler.proceed();
             }
         });
+
+        //顶部搜索按钮点击
+        RxView.clicks(searchHeadArea).compose(this.<Void>bindUntilEvent(FragmentEvent.DESTROY_VIEW))
+                .throttleFirst(1000, TimeUnit.MILLISECONDS)
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void aVoid) {
+                        if(webView != null){
+                            webView.callHandler("pause","",new CallBackFunction() {
+                                @Override
+                                public void onCallBack(String data) {
+
+                                }
+                            });
+                        }
+                        SearchDialogFragment.newInstance(parentFragmentId).show(getFragmentManager(),"SearchDialogFragment");
+                    }
+                });
+
     }
+
 
 
     @Override

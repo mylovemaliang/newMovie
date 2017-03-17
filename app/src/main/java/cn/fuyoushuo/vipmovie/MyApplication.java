@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.DisplayMetrics;
@@ -23,6 +24,7 @@ import com.tencent.smtt.sdk.TbsListener;
 import java.util.Stack;
 
 import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
+import cn.fuyoushuo.vipmovie.service.InitX5Service;
 import okhttp3.OkHttpClient;
 
 /**
@@ -62,48 +64,21 @@ public class MyApplication extends Application{
 
             }
         }).build();
+
+        //开启初始化x5服务
+        Intent serviceIntent = new Intent(context,InitX5Service.class);
+        startService(serviceIntent);
+
         Fresco.initialize(context,config);
         LocalFragmentManger.getIntance().initContext(context);
         GreenDaoManger.getIntance().initContext(context);
         GreenDaoManger.getIntance().initDatabase();
-//        Stetho.initializeWithDefaults(this);
+        Stetho.initializeWithDefaults(this);
         new OkHttpClient.Builder()
                 .addNetworkInterceptor(new StethoInterceptor())
                 .build();
 
-        QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
 
-            @Override
-            public void onViewInitFinished(boolean arg0) {
-                // TODO Auto-generated method stub
-                Log.e("###app qbk init###", " onViewInitFinished is " + arg0);
-            }
-
-            @Override
-            public void onCoreInitFinished() {
-                // TODO Auto-generated method stub
-
-            }
-        };
-
-        QbSdk.setTbsListener(new TbsListener() {
-            @Override
-            public void onDownloadFinish(int i) {
-                Log.d("###app qbk init###","onDownloadFinish");
-            }
-
-            @Override
-            public void onInstallFinish(int i) {
-                Log.d("###app qbk init###","onInstallFinish");
-            }
-
-            @Override
-            public void onDownloadProgress(int i) {
-                Log.d("###app qbk init###","onDownloadProgress:"+i);
-            }
-        });
-
-        QbSdk.initX5Environment(getApplicationContext(),  cb);
         //初始化异常拦截器
         //CrashHandler.getInstance().init(this);
         //用户登录信息管理
