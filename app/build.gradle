@@ -22,15 +22,15 @@ android {
     }
 
     //签名
-//    signingConfigs {
-//        relealse {
-//            //这样写就得把demo.jk文件放在项目目录
-//            storeFile file("fanqianbb.jks")
-//            storePassword "Fanqianbb20160726"
-//            keyAlias "fqbb-android"
-//            keyPassword "FanQianbb20160726"
-//        }
-//    }
+    signingConfigs {
+        relealse {
+            //这样写就得把demo.jk文件放在项目目录
+            storeFile file("vipmovie.jks")
+            storePassword "VipMovie20170324"
+            keyAlias "vipMovie-android"
+            keyPassword "vipmovie20170324"
+        }
+    }
 
     buildTypes {
         debug {
@@ -56,7 +56,7 @@ android {
             //前一部分代表系统默认的android程序的混淆文件，该文件已经包含了基本的混淆声明
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             //签名
-            //signingConfig signingConfigs.relealse
+            signingConfig signingConfigs.relealse
         }
     }
 

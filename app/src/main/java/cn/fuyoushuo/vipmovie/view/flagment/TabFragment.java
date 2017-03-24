@@ -9,24 +9,34 @@ import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jakewharton.rxbinding.view.RxView;
 import com.trello.rxlifecycle.FragmentEvent;
 import com.zhy.android.percent.support.PercentLinearLayout;
 
+import java.util.Observer;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import cn.fuyoushuo.commonlib.utils.RxBus;
+import cn.fuyoushuo.domain.entity.BookMark;
 import cn.fuyoushuo.domain.entity.HistoryItem;
+import cn.fuyoushuo.domain.entity.UserTrack;
 import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.R;
+import cn.fuyoushuo.vipmovie.ext.AppInfoManger;
 import cn.fuyoushuo.vipmovie.ext.FragmentTagGenerator;
 import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
 import cn.fuyoushuo.vipmovie.po.LoadItem;
 import cn.fuyoushuo.vipmovie.presenter.impl.TabPresenter;
+import cn.fuyoushuo.vipmovie.view.flagment.hisormark.hisFragment;
+import cn.fuyoushuo.vipmovie.view.flagment.hisormark.markFragment;
+import cn.fuyoushuo.vipmovie.view.layout.MenuWindow;
+import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -56,6 +66,12 @@ public class TabFragment extends BaseFragment{
     @Bind(R.id.tab_fragment_bottom)
     PercentLinearLayout bottomTabBar;
 
+    @Bind(R.id.tab_fragment_area)
+    LinearLayout tabFragmentLayout;
+
+    @Bind(R.id.tab_count_text)
+    TextView tabCountText;
+
     private Integer fragmentId;
 
     TabPresenter tabPresenter;
@@ -81,6 +97,8 @@ public class TabFragment extends BaseFragment{
     MainFragment mainFragment;
 
     Handler handler = new Handler();
+
+    MenuWindow menuWindow;
 
     @Override
     protected String getPageName() {
@@ -111,6 +129,10 @@ public class TabFragment extends BaseFragment{
     @Override
     protected void initView() {
         super.initView();
+
+        //初始化菜单
+        menuWindow = new MenuWindow(mactivity,bottomTabBar).init();
+
         mainFragment = MainFragment.newInstance(this.fragmentId);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.tab_fragment_area,mainFragment,"main_fragment").show(mainFragment);
@@ -122,6 +144,49 @@ public class TabFragment extends BaseFragment{
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //初始化tab的个数
+        Integer tabSize = LocalFragmentManger.getIntance().getTabSize();
+        tabCountText.setText(String.valueOf(tabSize));
+
+        menuWindow.setOnItemClick(new MenuWindow.OnItemClick() {
+            @Override
+            public void onNoPicClick() {
+                if(AppInfoManger.getIntance().isNoPic()){
+                    Toast.makeText(MyApplication.getContext(),"无图模式已打开",Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MyApplication.getContext(),"无图模式已关闭",Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onHisClick() {
+                HisOrMarkDialogFragment.newInstance(fragmentId).show(getFragmentManager(),"HisOrMarkDialogFragment");
+            }
+
+            @Override
+            public void onAddMarkClick() {
+                addBookmark();
+            }
+
+            @Override
+            public void onRefreshClick() {
+                 refreshView();
+            }
+
+            @Override
+            public void onExit() {
+                //关闭应用
+                Toast.makeText(MyApplication.getContext(),"应用马上就要关闭了",Toast.LENGTH_SHORT).show();
+                Observable.timer(3,TimeUnit.SECONDS)
+                        .subscribe(new Action1<Long>() {
+                            @Override
+                            public void call(Long aLong) {
+                                MyApplication.getMyapplication().finishAllActivity();
+                                MyApplication.getMyapplication().finishProgram();
+                            }
+                        });
+            }
+        });
 
         RxView.clicks(tabCountArea).compose(this.<Void>bindUntilEvent(FragmentEvent.DESTROY_VIEW))
                 .throttleFirst(1000,TimeUnit.MILLISECONDS)
@@ -179,6 +244,11 @@ public class TabFragment extends BaseFragment{
                     @Override
                     public void call(Void aVoid) {
                         // TODO: 2017/3/15
+                        if(menuWindow.isShowing()){
+                            menuWindow.dismissWindow();
+                        }else{
+                            menuWindow.showWindow();
+                        }
                     }
                 });
 
@@ -196,11 +266,39 @@ public class TabFragment extends BaseFragment{
 
     }
 
+    /**
+     * 刷新页面
+     */
+    public void refreshView(){
+        if(mainFragment != null && mContent == mainFragment){
+              mainFragment.refresh();
+        }
+        else if(contentFragment != null &&  mContent == contentFragment)
+        {
+              contentFragment.refresh();
+        }
+    }
+
+    public void updateTabSize(){
+        if(isDetched) return;
+        Integer tabSize = LocalFragmentManger.getIntance().getTabSize();
+        tabCountText.setText(String.valueOf(tabSize));
+    }
+
     //当fragment视图回到当前的fragment
     public void onClickToThisFragment(int fragmentId){
         if(isDetched || this.fragmentId != fragmentId) return;
         if(contentFragment != null && mContent == contentFragment && fragmentManager.findFragmentByTag("content_fragment") != null){
              contentFragment.onSwipeDiss();
+        }
+    }
+
+    //添加标签
+    private void addBookmark(){
+        if(contentFragment != null && mContent == contentFragment){
+            contentFragment.addBookmark();
+        }else{
+            Toast.makeText(MyApplication.getContext(),"当前页面不能添加标签",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -246,7 +344,7 @@ public class TabFragment extends BaseFragment{
                         public void run() {
                             handCommonToContentEvent(url);
                         }
-                    },100);
+                    },50);
                     return;
             }
             else if(busEvent instanceof SearchDialogFragment.toContentPageFromSearchEvent){
@@ -259,10 +357,35 @@ public class TabFragment extends BaseFragment{
                     public void run() {
                         handToContentEvent(historyItem);
                     }
-                },100);
+                },50);
                 return;
             }
-
+            else if(busEvent instanceof hisFragment.toContentPageFromHisPage){
+                hisFragment.toContentPageFromHisPage event = (hisFragment.toContentPageFromHisPage) busEvent;
+                final UserTrack userTrack = event.getUserTrack();
+                int parentFragmentId = event.getParentFragmentId();
+                if(parentFragmentId != fragmentId) return;
+                final String url = userTrack.getTrackUrl();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        handCommonToContentEvent(url);
+                    }
+                },50);
+            }
+            else if(busEvent instanceof markFragment.toContentPageFromMarkPage){
+                markFragment.toContentPageFromMarkPage event = (markFragment.toContentPageFromMarkPage) busEvent;
+                final BookMark bookMark = event.getBookMark();
+                int parentFragmentId = event.getParentFragmentId();
+                if(parentFragmentId != fragmentId) return;
+                final String url = bookMark.getMarkUrl();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                       handCommonToContentEvent(url);
+                    }
+                },50);
+             }
             }
         }));
     }

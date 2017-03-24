@@ -124,6 +124,7 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
         searchHisAdapter.setOnHisClick(new SearchHisAdapter.OnHisClick() {
             @Override
             public void onClick(View view, HistoryItem typeItem) {
+                typeItem.setCreateTime(new Date());
                 // 点击历史记录
                 searchPresenter.addHistory(typeItem, new SearchPresenter.addHistoryCallback() {
                     @Override
@@ -319,16 +320,6 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
     public void setHistoryItems(List<HistoryItem> result, boolean isOk) {
         searchHisAdapter.setData(result);
         searchHisAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onDelHistoryItem(boolean isOk) {
-        // TODO: 2017/3/10  
-    }
-
-    @Override
-    public void onAddHistoryItem(boolean isOk) {
-        // TODO: 2017/3/10
     }
 
     @Override

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.zhy.android.percent.support.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:id="@+id/head"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_widthPercent="15%w"
+        app:layout_heightPercent="100%h"
+        >
+
+        <ImageView
+            android:id="@+id/head_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/site"
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
+
+
+    <com.zhy.android.percent.support.PercentLinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_widthPercent="85%w"
+        app:layout_heightPercent="90%h"
+        android:orientation="vertical"
+        app:layout_marginTopPercent="5%h"
+        app:layout_marginBottomPercent="5%h"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/head"
+        android:layout_toEndOf="@+id/head">
+
+        <TextView
+            android:id="@+id/item_name_text"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_widthPercent="100%w"
+            app:layout_heightPercent="70%h"
+            android:textSize="13sp"
+            android:text="爱奇艺的电影真好看啊,dddd"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            />
+
+        <TextView
+            android:id="@+id/item_date_text"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_widthPercent="100%w"
+            app:layout_heightPercent="30%h"
+            android:textSize="13sp"
+            android:text="2017-02-14 14:25:56"
+            android:gravity="center_vertical|left"
+            />
+
+    </com.zhy.android.percent.support.PercentLinearLayout>
+
+
+</com.zhy.android.percent.support.PercentRelativeLayout>

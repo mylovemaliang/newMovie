@@ -20,13 +20,17 @@ public class BookMark  {
 
     private String markUrl;
 
+    private String urlmd5;
+
     private Date createTime;
 
-    @Generated(hash = 131522855)
-    public BookMark(Long id, String markName, String markUrl, Date createTime) {
+    @Generated(hash = 2058362888)
+    public BookMark(Long id, String markName, String markUrl, String urlmd5,
+            Date createTime) {
         this.id = id;
         this.markName = markName;
         this.markUrl = markUrl;
+        this.urlmd5 = urlmd5;
         this.createTime = createTime;
     }
 
@@ -56,6 +60,14 @@ public class BookMark  {
 
     public void setMarkUrl(String markUrl) {
         this.markUrl = markUrl;
+    }
+
+    public String getUrlmd5() {
+        return this.urlmd5;
+    }
+
+    public void setUrlmd5(String urlmd5) {
+        this.urlmd5 = urlmd5;
     }
 
     public Date getCreateTime() {

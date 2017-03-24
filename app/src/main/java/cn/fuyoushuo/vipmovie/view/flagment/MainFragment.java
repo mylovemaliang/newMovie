@@ -87,8 +87,6 @@ public class MainFragment extends BaseFragment implements IMainView{
 
     private MainPresenter mainPresenter;
 
-    FgoodDataAdapter fgoodDataAdapter;
-
     Handler handler = new Handler();
 
     NewsAdapter newsAdapter;
@@ -283,6 +281,11 @@ public class MainFragment extends BaseFragment implements IMainView{
 
     }
 
+    public void refresh(){
+        if(isDetched) return;
+        reload();
+    }
+
     //初始化字体图标
     private void initMingyanFront() {
         Typeface typeface = Typeface.createFromAsset(getActivity().getAssets(),"ziti/huawenxingkai.ttf");
@@ -309,16 +312,6 @@ public class MainFragment extends BaseFragment implements IMainView{
                 });
     }
 
-    //加载更多
-    private void loadMore(){
-//        if(!loadFooter.isShown()){
-//            loadFooter.setVisibility(View.VISIBLE);
-//        }
-        Integer page = fgoodDataAdapter.getCurrentPage();
-        Long cateId = fgoodDataAdapter.getCateId();
-        mainPresenter.getFGoods(cateId,page+1,false);
-    }
-
     //recycleview 返回顶部
     private void backToCommonPosi(){
         int scrollY = myScrollingView.getScrollY();
@@ -328,8 +321,8 @@ public class MainFragment extends BaseFragment implements IMainView{
     }
 
     private void reload(){
-        Long cateId = fgoodDataAdapter.getCateId();
-        mainPresenter.getFGoods(cateId,1,true);
+        String type = newsAdapter.getType();
+        mainPresenter.getNews(type,"",false);
     }
 
     private void HeaderTranslate(float distance) {
@@ -357,28 +350,7 @@ public class MainFragment extends BaseFragment implements IMainView{
     //----------------------------------view 回调 ----------------------------------------------------------
 
     @Override
-    public void setupFgoodsView(Integer page, Long cateId, List<FGoodItem> goodItems, boolean isRefresh) {
-        if(isRefresh){
-             fgoodDataAdapter.setData(goodItems);
-         }else{
-             fgoodDataAdapter.appendDataList(goodItems);
-         }
-        fgoodDataAdapter.notifyDataSetChanged();
-        fgoodDataAdapter.setCurrentPage(page);
-        fgoodDataAdapter.setCateId(cateId);
-//        Observable.timer(1000, TimeUnit.MILLISECONDS)
-//                .compose(this.<Long>bindUntilEvent(FragmentEvent.DESTROY_VIEW))
-//                .subscribeOn(Schedulers.computation())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Action1<Long>() {
-//                    @Override
-//                    public void call(Long aLong) {
-//                        if(loadFooter.isShown()){
-//                            loadFooter.setVisibility(View.GONE);
-//                        }
-//                    }
-//                });
-     }
+    public void setupFgoodsView(Integer page, Long cateId, List<FGoodItem> goodItems, boolean isRefresh) {}
 
     @Override
     public void setupNewsView(List<NewItem> newItems,String type,boolean isNext, boolean isSucc) {

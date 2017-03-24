@@ -49,14 +49,6 @@
                 android:textCursorDrawable="@null"
                 android:id="@+id/content_searchText"/>
         </com.zhy.android.percent.support.PercentLinearLayout>
-
-        <com.zhy.android.percent.support.PercentLinearLayout
-            android:id="@+id/content_head_area"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/module_19"
-            android:visibility="visible">
-        </com.zhy.android.percent.support.PercentLinearLayout>
     </com.zhy.android.percent.support.PercentRelativeLayout>
 
     <ProgressBar

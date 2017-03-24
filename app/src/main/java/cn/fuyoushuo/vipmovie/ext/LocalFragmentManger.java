@@ -132,4 +132,15 @@ public class LocalFragmentManger {
          return resultList;
     }
 
+    public int getNeedDeleteItem(){
+        Iterator<Map.Entry<Integer, Pair>> iterator = fragmentMap.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<Integer, Pair> next = iterator.next();
+            int id = next.getKey();
+            if(id == currentId) continue;
+            return id;
+        }
+        return -1;
+    }
+
 }

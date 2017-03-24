@@ -12,10 +12,6 @@ public interface ISearchView {
 
     void setHistoryItems(List<HistoryItem> result,boolean isOk);
 
-    void onDelHistoryItem(boolean isOk);
-
-    void onAddHistoryItem(boolean isOk);
-
     void setHistorySearchItems(List<HistoryItem> result,boolean isOk);
 
 }

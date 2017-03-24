@@ -1,17 +1,24 @@
 package cn.fuyoushuo.vipmovie.presenter.impl;
 
 import android.text.TextUtils;
+import android.text.style.UnderlineSpan;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
+import org.apache.log4j.or.ThreadGroupRenderer;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.fuyoushuo.commonlib.utils.MD5;
+import cn.fuyoushuo.domain.entity.BookMark;
 import cn.fuyoushuo.domain.entity.HistoryItem;
+import cn.fuyoushuo.domain.entity.UserTrack;
+import cn.fuyoushuo.domain.greendao.BookMarkDao;
 import cn.fuyoushuo.domain.greendao.HistoryItemDao;
+import cn.fuyoushuo.domain.greendao.UserTrackDao;
 import cn.fuyoushuo.domain.httpservice.BaiduHttpService;
 import cn.fuyoushuo.vipmovie.GreenDaoManger;
 import cn.fuyoushuo.vipmovie.ServiceManager;
@@ -33,9 +40,17 @@ public class SearchPresenter extends BasePresenter {
         this.searchView = new WeakReference<ISearchView>(searchView);
     }
 
+    public SearchPresenter() {
+    }
+
     private ISearchView getMyView(){
         return searchView.get();
     }
+
+
+
+
+    //-----------------------------------------历史记录相关---------------------------------------------
 
     /**
      * 获取所有的历史记录
@@ -103,9 +118,9 @@ public class SearchPresenter extends BasePresenter {
     /**
      * 删除历史记录
      */
-    public void delHistory(HistoryItem historyItem){
+    public void delHistory(HistoryItem historyItem,final DeleteHistoryCallback deleteHistoryCallback){
         if (historyItem == null || historyItem.getId() == null) return;
-        mSubscriptions.add(createDelHisObserver()
+        mSubscriptions.add(createDelHisObserver(historyItem)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Boolean>() {
@@ -117,21 +132,26 @@ public class SearchPresenter extends BasePresenter {
 
                     @Override
                     public void onError(Throwable e) {
-                        if(getMyView() != null){
-                            getMyView().onDelHistoryItem(false);
+                        if(deleteHistoryCallback != null){
+                            deleteHistoryCallback.onDeleteHistory(false);
                         }
                     }
 
                     @Override
                     public void onNext(Boolean isOk) {
-                        if(getMyView() != null){
-                            getMyView().onDelHistoryItem(true);
+                        if(deleteHistoryCallback != null){
+                            deleteHistoryCallback.onDeleteHistory(true);
                         }
                     }
                 })
         );
     }
 
+    /**
+     * 更新历史记录
+     * @param id
+     * @param title
+     */
     public static void updateHistoryTitle(Long id,String title){
         createUpdateHistoryObservere(id,title)
                 .subscribeOn(Schedulers.io())
@@ -194,12 +214,288 @@ public class SearchPresenter extends BasePresenter {
     }
 
 
+    //----------------------------------------------------------------------------------------------
+
+    /**
+     * 获取所有的历史记录
+     * @param findAllHisCallback
+     */
+    public void findAllHistorys(final FindAllHisCallback findAllHisCallback){
+        mSubscriptions.add(createFindHisObserver()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<HistoryItem>>() {
+
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if(findAllHisCallback != null){
+                            findAllHisCallback.onFindAllHistorys(new ArrayList<HistoryItem>(),false);
+                        }
+                    }
+
+                    @Override
+                    public void onNext(List<HistoryItem> historyItems) {
+                        if(findAllHisCallback != null){
+                            findAllHisCallback.onFindAllHistorys(historyItems,true);
+                        }
+                    }
+                })
+        );
+    }
+
+    //-----------------------------------------书签记录-----------------------------------------------
+
+    /**
+     * 获取所有的书签记录
+     * @param findAllBookMarkCallback
+     */
+    public void findAllBookmarks(final FindAllBookMarkCallback findAllBookMarkCallback){
+         mSubscriptions.add(createFindBookmarkObserver()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<BookMark>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if(findAllBookMarkCallback != null){
+                            findAllBookMarkCallback.onFindAllBookmarks(new ArrayList<BookMark>(),false);
+                        }
+                    }
+
+                    @Override
+                    public void onNext(List<BookMark> bookMarks) {
+                        if(findAllBookMarkCallback != null){
+                            findAllBookMarkCallback.onFindAllBookmarks(bookMarks,true);
+                        }
+                    }
+                })
+
+         );
+    }
+
+    /**
+     * 删除书签
+     * @param bookMark
+     * @param deleteBookmarkCallback
+     */
+    public void deleteBookMark(BookMark bookMark,final DeleteBookmarkCallback deleteBookmarkCallback){
+        mSubscriptions.add(createDelMarkObserver(bookMark)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Subscriber<Boolean>() {
+                @Override
+                public void onCompleted() {
+
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                   if(deleteBookmarkCallback != null){
+                       deleteBookmarkCallback.onDeleteBookMark(false);
+                   }
+                }
+
+                @Override
+                public void onNext(Boolean aBoolean) {
+                    if(deleteBookmarkCallback != null){
+                        deleteBookmarkCallback.onDeleteBookMark(true);
+                    }
+                }
+            })
+
+        );
+    }
+
+    /**
+     * 添加书签
+     * @param bookMark
+     * @param addBookmarkCallback
+     */
+    public void addBookmark(final BookMark bookMark, final AddBookmarkCallback addBookmarkCallback){
+        mSubscriptions.add(createAddBookmarkObserver(bookMark)
+              .subscribeOn(Schedulers.io())
+              .observeOn(AndroidSchedulers.mainThread())
+              .subscribe(new Subscriber<BookMark>() {
+                  @Override
+                  public void onCompleted() {
+
+                  }
+
+                  @Override
+                  public void onError(Throwable e) {
+                       if(addBookmarkCallback != null){
+                           addBookmarkCallback.onAddBookMark(bookMark,false);
+                       }
+                  }
+
+                  @Override
+                  public void onNext(BookMark bookMark) {
+                       if(addBookmarkCallback != null){
+                           addBookmarkCallback.onAddBookMark(bookMark,true);
+                       }
+                  }
+              })
+        );
+    }
+
+    //---------------------------------------------用户踪迹相关---------------------------------------------
+
+    /**
+     * 添加用户踪迹
+     * @param userTrack
+     * @param addUserTrackCallback
+     */
+    public void addUserTrack(final UserTrack userTrack, final AddUserTrackCallback addUserTrackCallback){
+        mSubscriptions.add(createAddUserTrackObserver(userTrack)
+              .subscribeOn(Schedulers.io())
+              .observeOn(AndroidSchedulers.mainThread())
+              .subscribe(new Subscriber<UserTrack>() {
+                  @Override
+                  public void onCompleted() {
+
+                  }
+
+                  @Override
+                  public void onError(Throwable e) {
+                    if(addUserTrackCallback != null){
+                        addUserTrackCallback.onAddUserTrack(userTrack,false);
+                    }
+                  }
+
+                  @Override
+                  public void onNext(UserTrack userTrack) {
+                     if(addUserTrackCallback != null){
+                         addUserTrackCallback.onAddUserTrack(userTrack,true);
+                     }
+                  }
+              })
+
+        );
+  }
+
+    /**
+     * 查询所有的用户踪迹
+     * @param findAllUtCallback
+     */
+    public void findAllUserTrack(final FindAllUtCallback findAllUtCallback){
+        mSubscriptions.add(createFindUserTrackObserver()
+           .subscribeOn(Schedulers.io())
+           .observeOn(AndroidSchedulers.mainThread())
+           .subscribe(new Subscriber<List<UserTrack>>() {
+               @Override
+               public void onCompleted() {
+
+               }
+
+               @Override
+               public void onError(Throwable e) {
+                   if(findAllUtCallback != null){
+                       findAllUtCallback.onFindAllUserTrack(new ArrayList<UserTrack>(),false);
+                   }
+               }
+
+               @Override
+               public void onNext(List<UserTrack> userTracks) {
+                   if(findAllUtCallback != null){
+                       findAllUtCallback.onFindAllUserTrack(userTracks,true);
+                   }
+               }
+           })
+        );
+    }
+
+    /**
+     * 删除所有的用户踪迹
+      * @param deleteAllUtCallback
+     */
+    public void deleteAllUserTrack(final DeleteAllUtCallback deleteAllUtCallback){
+        mSubscriptions.add(createDeleteAllUserTrackObserver()
+             .subscribeOn(Schedulers.io())
+             .observeOn(AndroidSchedulers.mainThread())
+             .subscribe(new Subscriber<Boolean>() {
+                 @Override
+                 public void onCompleted() {
+
+                 }
+
+                 @Override
+                 public void onError(Throwable e) {
+                    if(deleteAllUtCallback != null){
+                        deleteAllUtCallback.onDeleteAllUserTrack(false);
+                    }
+                 }
+
+                 @Override
+                 public void onNext(Boolean aBoolean) {
+                     if(deleteAllUtCallback != null){
+                         deleteAllUtCallback.onDeleteAllUserTrack(true);
+                     }
+                 }
+             })
+        );
+    }
+
+    //-------------------------------------------------------------------------------------------
+
+
     //-----------------------------------自定义接口------------------------------------------------
 
     public interface addHistoryCallback{
 
         void onAddCallBack(Boolean isOk);
 
+    }
+
+    public interface FindAllHisCallback{
+
+        void onFindAllHistorys(List<HistoryItem> result,boolean isOk);
+
+    }
+
+    public interface FindAllBookMarkCallback{
+
+        void onFindAllBookmarks(List<BookMark> result,boolean isOk);
+    }
+
+    public interface DeleteHistoryCallback{
+
+         void onDeleteHistory(boolean isOk);
+    }
+
+    public interface DeleteBookmarkCallback{
+
+         void onDeleteBookMark(boolean isOk);
+
+    }
+
+    public interface AddBookmarkCallback{
+
+        void onAddBookMark(BookMark bookMark,boolean isOk);
+
+    }
+
+    public interface AddUserTrackCallback{
+
+        void onAddUserTrack(UserTrack userTrack,boolean isOk);
+    }
+
+    public interface FindAllUtCallback{
+
+        void onFindAllUserTrack(List<UserTrack> result,boolean isOk);
+    }
+
+    public interface DeleteAllUtCallback{
+
+        void onDeleteAllUserTrack(boolean isOk);
     }
 
 
@@ -247,11 +543,31 @@ public class SearchPresenter extends BasePresenter {
     }
 
     /**
+     * 添加书签
+     * @param bookMark
+     * @return
+     */
+    private Observable<BookMark> createAddBookmarkObserver(final BookMark bookMark){
+       return Observable.create(new Observable.OnSubscribe<BookMark>() {
+           @Override
+           public void call(Subscriber<? super BookMark> subscriber) {
+               BookMarkDao bookMarkDao = GreenDaoManger.getIntance().getmDaoSession().getBookMarkDao();
+               //删除旧的相同的书签记录
+               bookMarkDao.queryBuilder().where(BookMarkDao.Properties.Urlmd5.eq(bookMark.getUrlmd5())).buildDelete().executeDeleteWithoutDetachingEntities();
+               //插入新的书签记录
+               long insert = bookMarkDao.insert(bookMark);
+               bookMark.setId(insert);
+               subscriber.onNext(bookMark);
+           }
+       });
+    }
+
+    /**
      * 删除所有历史记录
      * @param
      * @return
      */
-    private Observable<Boolean> createDelHisObserver(){
+    private Observable<Boolean> createDelAllHisObserver(){
         return Observable.create(new Observable.OnSubscribe<Boolean>() {
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
@@ -260,6 +576,26 @@ public class SearchPresenter extends BasePresenter {
                              .getHistoryItemDao()
                              .deleteAll();
                subscriber.onNext(true);
+            }
+        });
+    }
+
+    private Observable<Boolean> createDelHisObserver(final HistoryItem historyItem){
+        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+            @Override
+            public void call(Subscriber<? super Boolean> subscriber) {
+                GreenDaoManger.getIntance().getmDaoSession().getHistoryItemDao().delete(historyItem);
+                subscriber.onNext(true);
+            }
+        });
+    }
+
+    private Observable<Boolean> createDelMarkObserver(final BookMark bookMark){
+        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+            @Override
+            public void call(Subscriber<? super Boolean> subscriber) {
+                GreenDaoManger.getIntance().getmDaoSession().getBookMarkDao().delete(bookMark);
+                subscriber.onNext(true);
             }
         });
     }
@@ -285,6 +621,56 @@ public class SearchPresenter extends BasePresenter {
                     load.setHistoryTitle(title);
                     historyItemDao.update(load);
                 }
+            }
+        });
+    }
+
+    //获取所有的书签
+    private Observable<List<BookMark>> createFindBookmarkObserver(){
+        return Observable.create(new Observable.OnSubscribe<List<BookMark>>() {
+            @Override
+            public void call(Subscriber<? super List<BookMark>> subscriber) {
+                BookMarkDao bookMarkDao = GreenDaoManger.getIntance().getmDaoSession().getBookMarkDao();
+                List<BookMark> list = bookMarkDao.queryBuilder().list();
+                subscriber.onNext(list);
+            }
+        });
+    }
+
+    //添加用户踪迹
+    public Observable<UserTrack> createAddUserTrackObserver(final UserTrack userTrack){
+        return Observable.create(new Observable.OnSubscribe<UserTrack>() {
+            @Override
+            public void call(Subscriber<? super UserTrack> subscriber) {
+                UserTrackDao userTrackDao = GreenDaoManger.getIntance().getmDaoSession().getUserTrackDao();
+                userTrackDao.queryBuilder().where(UserTrackDao.Properties.Md5Url.eq(userTrack.getMd5Url())).buildDelete().executeDeleteWithoutDetachingEntities();
+                long insert = userTrackDao.insert(userTrack);
+                userTrack.setId(insert);
+                subscriber.onNext(userTrack);
+            }
+        });
+    }
+
+    //获取所有的用户踪迹记录
+    private Observable<List<UserTrack>> createFindUserTrackObserver(){
+        return Observable.create(new Observable.OnSubscribe<List<UserTrack>>() {
+            @Override
+            public void call(Subscriber<? super List<UserTrack>> subscriber) {
+                UserTrackDao userTrackDao = GreenDaoManger.getIntance().getmDaoSession().getUserTrackDao();
+                List<UserTrack> result = userTrackDao.queryBuilder().orderDesc(UserTrackDao.Properties.CreateTime).list();
+                subscriber.onNext(result);
+            }
+        });
+    }
+
+    //删除所有的用户踪迹记录
+    private Observable<Boolean> createDeleteAllUserTrackObserver(){
+        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+            @Override
+            public void call(Subscriber<? super Boolean> subscriber) {
+                UserTrackDao userTrackDao = GreenDaoManger.getIntance().getmDaoSession().getUserTrackDao();
+                userTrackDao.deleteAll();
+                subscriber.onNext(true);
             }
         });
     }

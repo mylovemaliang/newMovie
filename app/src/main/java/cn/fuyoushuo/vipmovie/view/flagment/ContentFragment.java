@@ -3,6 +3,7 @@ package cn.fuyoushuo.vipmovie.view.flagment;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -16,6 +17,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.jakewharton.rxbinding.view.RxView;
@@ -31,15 +33,31 @@ import com.tencent.smtt.sdk.WebView;
 import com.trello.rxlifecycle.FragmentEvent;
 import com.zhy.android.percent.support.PercentLinearLayout;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownServiceException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
+import cn.fuyoushuo.commonlib.utils.CommonUtils;
+import cn.fuyoushuo.commonlib.utils.MD5;
 import cn.fuyoushuo.commonlib.utils.RxBus;
+import cn.fuyoushuo.domain.entity.BookMark;
+import cn.fuyoushuo.domain.entity.UserTrack;
+import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.R;
+import cn.fuyoushuo.vipmovie.ext.AppInfoManger;
 import cn.fuyoushuo.vipmovie.po.LoadItem;
+import cn.fuyoushuo.vipmovie.presenter.impl.ContentPresenter;
 import cn.fuyoushuo.vipmovie.presenter.impl.SearchPresenter;
 import cn.fuyoushuo.vipmovie.view.X5View.X5BridgeUtils;
 import cn.fuyoushuo.vipmovie.view.X5View.X5BridgeWebView;
@@ -60,9 +78,6 @@ public class ContentFragment extends BaseFragment {
 
     @Bind(R.id.x5_webview)
     X5BridgeWebView webView;
-
-    @Bind(R.id.content_head_area)
-    PercentLinearLayout ContentHeadArea;
 
     @Bind(R.id.search_head_area)
     PercentLinearLayout searchHeadArea;
@@ -96,6 +111,12 @@ public class ContentFragment extends BaseFragment {
         defaultHeaders.put("User-Agent","Mozilla/5.0 (Linux; Android 6.0; Le X620 Build/HEXCNFN5902012151S) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.91 Mobile Safari/537.36");
     }
 
+    private String currentPageTitle;
+
+    SearchPresenter searchPresenter;
+
+    ContentPresenter contentPresenter;
+
 
     @Override
     protected String getPageName() {
@@ -118,6 +139,8 @@ public class ContentFragment extends BaseFragment {
             initArgs(loadType,loadUrl,hisId,keyWord);
             this.parentFragmentId = getArguments().getInt("parentFragmentId",-1);
         }
+        searchPresenter = new SearchPresenter();
+        contentPresenter = new ContentPresenter();
     }
 
     private void initArgs(int loadType,String loadUrl,Long hisId ,String keyWord) {
@@ -162,6 +185,9 @@ public class ContentFragment extends BaseFragment {
         webSetting.setJavaScriptEnabled(true);
         webSetting.setGeolocationEnabled(true);
         webSetting.setAppCacheMaxSize(Long.MAX_VALUE);
+        //webSetting.setUserAgentString("Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Mobile Safari/537.36");
+
+        //webView.setDownloadListener();
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             webSetting.setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
@@ -180,6 +206,7 @@ public class ContentFragment extends BaseFragment {
             public void onReceivedTitle(WebView view, final String title) {
                 super.onReceivedTitle(view, title);
                 headText.setText(title);
+                currentPageTitle = title;
                 if(currentHisId != null && loadType == 2 && isTitleSet == false){
                    SearchPresenter.updateHistoryTitle(currentHisId,title);
                    isTitleSet = true;
@@ -236,13 +263,39 @@ public class ContentFragment extends BaseFragment {
             }
 
             @Override
-            public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest webResourceRequest) {
+            public WebResourceResponse shouldInterceptRequest(final WebView webView, final WebResourceRequest webResourceRequest) {
+                String url = webResourceRequest.getUrl().toString();
+                //http://static.qiyi.com/js/html5/js/page/playMovie/4fada7f5!app_movie.js
+
+                if(url.startsWith("http://static.qiyi.com/js/html5/js/page/playMovie/")){
+                    InputStream resultInputStream = null;
+                    try {
+                        String result = contentPresenter.jsReplaceToKillAd(url);
+                        resultInputStream = new ByteArrayInputStream(result.getBytes("gbk"));
+                        return new WebResourceResponse("text/javascript","gbk",resultInputStream);
+                    }catch (Exception e){
+
+                    }finally {
+                        if(resultInputStream != null){
+                            try {
+                                resultInputStream.close();
+                            } catch (IOException e) {
+
+                            }
+                        }
+                    }
+                }
                 return super.shouldInterceptRequest(webView, webResourceRequest);
             }
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
+                if(AppInfoManger.getIntance().isNoPic()){
+                    webSetting.setBlockNetworkImage(true);
+                }else{
+                    webSetting.setBlockNetworkImage(false);
+                }
             }
 
             @Override
@@ -251,10 +304,11 @@ public class ContentFragment extends BaseFragment {
                 if(webView != null){
 //                    String jsContent1 = BridgeUtil.assetFile2Str(MyApplication.getContext(), "vip3.js");
 //                    webView.loadUrl("javascript:" + jsContent1);
-
                       String jsUrl = "http://testwww.fanqianbb.com/vip.js";
                       X5BridgeUtils.webViewLoadJs(webView,jsUrl);
                 }
+                //保存用户踪迹
+                saveUserTrack(url);
             }
 
             @Override
@@ -284,15 +338,36 @@ public class ContentFragment extends BaseFragment {
 
     }
 
+    //保存用户的踪迹
+    public void saveUserTrack(String url){
+        String title = currentPageTitle;
+        UserTrack userTrack = new UserTrack();
+        userTrack.setCreateTime(new Date());
+        userTrack.setTrackName(title);
+        userTrack.setTrackUrl(url);
+        userTrack.setMd5Url(MD5.MD5Encode(url));
+        searchPresenter.addUserTrack(userTrack, new SearchPresenter.AddUserTrackCallback() {
+            @Override
+            public void onAddUserTrack(UserTrack userTrack, boolean isOk) {}
+        });
+    }
+
 
 
     @Override
     public void onStart() {
         super.onStart();
         startPage();
-        if(loadType == 2 || loadType == 3){
-            ContentHeadArea.setVisibility(View.GONE);
-        }
+    }
+
+    /**
+     * 刷新页面
+     */
+    public void refresh(){
+       if(isDetched) return;
+       if(webView != null){
+           webView.reload();
+       }
     }
 
     @Override
@@ -376,7 +451,7 @@ public class ContentFragment extends BaseFragment {
     public void onSwipeDiss(){
         webView.onResume();
         try {
-            Thread.sleep(500l);
+            Thread.sleep(200l);
             webView.callHandler("play", "", new CallBackFunction() {
                 @Override
                 public void onCallBack(String data) {
@@ -386,6 +461,32 @@ public class ContentFragment extends BaseFragment {
         } catch (InterruptedException e) {
 
         }
+    }
+
+    /**
+     * 增加标签
+     */
+    public void addBookmark(){
+        if(isDetched) return;
+        String title = this.currentPageTitle;
+        String url = webView.getUrl();
+        BookMark bookMark = new BookMark();
+        bookMark.setCreateTime(new Date());
+        if(!TextUtils.isEmpty(title)){
+            bookMark.setMarkName(CommonUtils.getShortTitle(title));
+        }
+        if(!TextUtils.isEmpty(url)){
+            bookMark.setMarkUrl(url);
+            bookMark.setUrlmd5(MD5.MD5Encode(url));
+        }
+        searchPresenter.addBookmark(bookMark, new SearchPresenter.AddBookmarkCallback() {
+            @Override
+            public void onAddBookMark(BookMark bookMark, boolean isOk) {
+                 if(isOk){
+                     Toast.makeText(MyApplication.getContext(),"书签添加成功",Toast.LENGTH_SHORT).show();
+                 }
+            }
+        });
     }
 
 
@@ -428,17 +529,10 @@ public class ContentFragment extends BaseFragment {
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if(!hidden){
-            webView.callHandler("play", "", new CallBackFunction() {
-                @Override
-                public void onCallBack(String data) {
-                    webView.onPause();
-                }
-            });
-        }else{
+            webView.onResume();
             try {
-                webView.onResume();
-                Thread.sleep(500l);
-                webView.callHandler("pause", "", new CallBackFunction() {
+                Thread.sleep(200l);
+                webView.callHandler("play", "", new CallBackFunction() {
                     @Override
                     public void onCallBack(String data) {
 
@@ -447,6 +541,14 @@ public class ContentFragment extends BaseFragment {
             } catch (InterruptedException e) {
 
             }
+        }else{
+            webView.callHandler("pause", "", new CallBackFunction() {
+                    @Override
+                    public void onCallBack(String data) {
+                        webView.onPause();
+                    }
+            });
+
         }
     }
 
@@ -462,6 +564,12 @@ public class ContentFragment extends BaseFragment {
             webView.freeMemory();
             webView.destroy();
             webView=null;
+        }
+        if(searchPresenter != null){
+            searchPresenter.onDestroy();
+        }
+        if(contentPresenter != null){
+            contentPresenter.onDestroy();
         }
     }
 }

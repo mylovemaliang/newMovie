@@ -25,6 +25,16 @@ public class CommonUtils {
         return title.substring(0,10)+"...";
     }
 
+    public static String getShortString(String url,int size){
+        if(TextUtils.isEmpty(url)){
+            return "";
+        }
+        if(url.length() <= size){
+            return url;
+        }
+        return url.substring(0,size)+"...";
+    }
+
     /**
      * 字符串格式化为字符串数组
      * @param itemsstring

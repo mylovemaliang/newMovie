@@ -24,6 +24,7 @@ import cn.fuyoushuo.vipmovie.R;
 import cn.fuyoushuo.vipmovie.ext.BitmapManger;
 import cn.fuyoushuo.vipmovie.ext.FragmentTagGenerator;
 import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
+import cn.fuyoushuo.vipmovie.ext.Pair;
 import cn.fuyoushuo.vipmovie.view.flagment.SwipeDialogFragment;
 import cn.fuyoushuo.vipmovie.view.flagment.TabFragment;
 import rx.Subscriber;
@@ -41,7 +42,7 @@ public class MainActivity extends BaseActivity{
 
     private CompositeSubscription mSubscriptions;
 
-    List<Fragment> backFragments = new ArrayList<Fragment>();
+    List<TabFragment> backFragments = new ArrayList<TabFragment>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +60,9 @@ public class MainActivity extends BaseActivity{
         String fragmentTag = FragmentTagGenerator.getFragmentTag();
         Integer fragmentId = LocalFragmentManger.getIntance().addFragment(fragmentTag);
         TabFragment tabFragment = TabFragment.newInstance(fragmentId);
-
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.fragment_area,tabFragment,fragmentTag).show(tabFragment);
-
+        backFragments.add(tabFragment);
         mContent = tabFragment;
         fragmentTransaction.commitAllowingStateLoss();
         fragmentManager.executePendingTransactions();
@@ -83,10 +83,15 @@ public class MainActivity extends BaseActivity{
             @Override
             public void onNext(RxBus.BusEvent busEvent) {
                  if(busEvent instanceof SwipeDialogFragment.addTabEvent){
-                      //增加fragment
+                     boolean result = checkAdd();
+                     //增加fragment
                      String fragmentTag = FragmentTagGenerator.getFragmentTag();
                      Integer fragmentId = LocalFragmentManger.getIntance().addFragment(fragmentTag);
                      TabFragment tabFragment = TabFragment.newInstance(fragmentId);
+                     if(!result){
+                        tellAllChildToUpdateCount();
+                     }
+                     backFragments.add(tabFragment);
                      LocalFragmentManger.getIntance().setCurrentId(fragmentId);
                      switchContent(mContent,tabFragment,fragmentTag);
                  }
@@ -101,6 +106,38 @@ public class MainActivity extends BaseActivity{
                  }
             }
         }));
+    }
+
+    /**
+     * 检查增加fragment
+     * @return true:已经削减 | false:没有变化
+     */
+    private boolean checkAdd(){
+        LocalFragmentManger intance = LocalFragmentManger.getIntance();
+        Integer tabSize = intance.getTabSize();
+        if(tabSize == 5){
+            int needDeleteItem = intance.getNeedDeleteItem();
+            Pair pair = intance.getFragment(needDeleteItem);
+            String fragmentTag = pair.getFragmentTag();
+            Fragment fragmentByTag = fragmentManager.findFragmentByTag(fragmentTag);
+            backFragments.remove(fragmentByTag);
+            intance.removeFragment(needDeleteItem);
+            BitmapManger.getIntance().removeBitmap(needDeleteItem);
+            if(fragmentByTag != null){
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                transaction.remove(fragmentByTag);
+                transaction.commitAllowingStateLoss();
+                fragmentManager.executePendingTransactions();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private void tellAllChildToUpdateCount(){
+        for(TabFragment fragment : backFragments){
+             fragment.updateTabSize();
+        }
     }
 
     //点击tab
@@ -137,6 +174,8 @@ public class MainActivity extends BaseActivity{
         }else{
             fragmentTransaction.remove(deleteFragment);
         }
+        backFragments.remove(deleteFragment);
+        tellAllChildToUpdateCount();
         fragmentTransaction.commitAllowingStateLoss();
         fragmentManager.executePendingTransactions();
     }

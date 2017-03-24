@@ -38,7 +38,7 @@ public class SimpleTouchCallback extends ItemTouchHelper.Callback {
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-         if(direction == UP){
+         if(direction == UP || direction == DOWN){
              onMoveListener.onItemDismiss(viewHolder.getAdapterPosition());
          }
     }
