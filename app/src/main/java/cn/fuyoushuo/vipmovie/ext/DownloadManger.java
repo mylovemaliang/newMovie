@@ -5,6 +5,12 @@ import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import java.util.Date;
+
+import cn.fuyoushuo.domain.entity.DownloadTask;
+import cn.fuyoushuo.domain.greendao.DownloadTaskDao;
+import cn.fuyoushuo.vipmovie.GreenDaoManger;
+
 /**
  * Created by QA on 2017/3/20.
  */
@@ -33,32 +39,28 @@ public class DownloadManger {
      * @param taskurl
      * @param title
      */
-    public void submitTask(String taskurl,String title){
+    public void submitTask(String taskurl,String title,String mineType){
         if(TextUtils.isEmpty(taskurl)) return;
-        DownloadTask downloadTask = new DownloadTask(taskurl, title);
-        DownloadManager.Request request = new DownloadManager.Request(downloadTask.getDownloadUri());
-        
-
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(taskurl));
+        request.setTitle(title);
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
+        request.setMimeType(mineType);
+        DownloadTask task = new DownloadTask();
+        task.setCreateTime(new Date());
+        task.setTaskState(1);
+        task.setTitle(title);
+        task.setUrl(taskurl);
+        long downloadId = this.downloadManager.enqueue(request);
+        task.setDownloadId(downloadId);
+        saveDownloadItem(task);
+        return;
     }
 
-
-    /**
-     * 封装下载任务
-     */
-    static class DownloadTask{
-
-        private  String title;
-
-        private  String url;
-
-        public DownloadTask(String url, String title) {
-            this.url = url;
-            this.title = title;
-        }
-
-        public Uri getDownloadUri(){
-            return Uri.parse(this.url);
-        }
+    //数据库保持下载的基本信息
+    private void saveDownloadItem(DownloadTask downloadTask){
+        DownloadTaskDao downloadTaskDao = GreenDaoManger.getIntance().getmDaoSession().getDownloadTaskDao();
+        downloadTaskDao.insert(downloadTask);
     }
 
 }
