@@ -2,10 +2,13 @@ package cn.fuyoushuo.vipmovie.presenter.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.facebook.stetho.server.AddressNameHelper;
 
 import java.io.IOException;
 import java.util.Map;
 
+import cn.fuyoushuo.commonlib.utils.ClientReturnEncoder;
+import cn.fuyoushuo.commonlib.utils.Constants;
 import cn.fuyoushuo.domain.entity.HttpResp;
 import cn.fuyoushuo.domain.httpservice.VipwwwHttpService;
 import cn.fuyoushuo.vipmovie.ServiceManager;
@@ -88,6 +91,34 @@ public class SessionPresenter extends BasePresenter{
                  }));
     }
 
+    public void getDataFromFreeResolve(final String input,final FreeResolveCallback freeResolveCallback){
+        mSubscriptions.add(createFreeResolveDataBackObserver(input)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Subscriber<String>() {
+                @Override
+                public void onCompleted() {
+
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                  if(freeResolveCallback != null){
+                      freeResolveCallback.onGetFreeResolve("",false);
+                  }
+                }
+
+                @Override
+                public void onNext(String s) {
+                  if(freeResolveCallback != null){
+                      freeResolveCallback.onGetFreeResolve(s,true);
+                  }
+                }
+            })
+
+        );
+    }
+
 
     //------------------------------------回调接口------------------------------------------------------
 
@@ -100,6 +131,11 @@ public class SessionPresenter extends BasePresenter{
     public interface DataGetCallback{
 
         void onGetData(String result,boolean isOk);
+    }
+
+    public interface FreeResolveCallback{
+
+        void onGetFreeResolve(String result,boolean isOk);
     }
 
 
@@ -121,5 +157,28 @@ public class SessionPresenter extends BasePresenter{
                 }
             }
         }) ;
+    }
+
+    private Observable<String> createFreeResolveDataBackObserver(final String input){
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                String encodeString = ClientReturnEncoder.getEncodeString(input);
+                String url = Constants.FreeResovleUrl+encodeString;
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+                try {
+                    Response execute = okHttpClient.newCall(request).execute();
+                    String result = execute.body().string();
+                    result = result.trim().replace("\n","").replace("\t","");
+                    subscriber.onNext(result);
+                } catch (IOException e) {
+                    subscriber.onError(e);
+                }
+
+
+            }
+        });
     }
 }

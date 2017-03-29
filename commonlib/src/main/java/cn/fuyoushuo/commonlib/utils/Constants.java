@@ -26,10 +26,13 @@ public class Constants {
 
     public static final String ENDPOINT_BAIDU="http://www.baidu.com";
 
-    public static final String ENDPOINT_VIPKDY="http://s.vipkdy.cn";
+    public static final String ENDPOINT_VIPKDY="http://www.sviphome.com";
 
-    //test
-    public static final String ENDPOINT_WWW_VIP = "http://192.168.31.105";
+    public static final String ENDPOINT_WWW_VIP = "http://www.sviphome.com";
+
+    //--------------------------------自由解析变量----------------------------------------------------
+
+    public static final String FreeResovleUrl = "http://c.vipkdy.com/q2.htm?";
 
 
 

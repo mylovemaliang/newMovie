@@ -3,6 +3,7 @@ package cn.fuyoushuo.vipmovie;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import cn.fuyoushuo.domain.ext.MyOpenHelper;
 import cn.fuyoushuo.domain.greendao.DaoMaster;
 import cn.fuyoushuo.domain.greendao.DaoSession;
 
@@ -27,7 +28,7 @@ public class GreenDaoManger {
         this.context = context;
     }
 
-    private DaoMaster.DevOpenHelper mHelper;
+    private DaoMaster.OpenHelper mHelper;
 
     private SQLiteDatabase db;
 
@@ -37,11 +38,13 @@ public class GreenDaoManger {
 
     //初始化
     public void initDatabase(){
-         mHelper = new DaoMaster.DevOpenHelper(this.context,"vip-movie-db",null);
+          mHelper = new MyOpenHelper(this.context,"vip_movie_db",null);
+         //mHelper = new DaoMaster.DevOpenHelper(this.context,"vip-movie-db",null);
          db = mHelper.getWritableDatabase();
          mDaoMaster = new DaoMaster(db);
          //这里新建多个session,对应一个数据库连接
-         mDaoSession = mDaoMaster.newDevSession(context,"vip_movie_dev");
+         mDaoSession = mDaoMaster.newSession();
+         //mDaoSession = mDaoMaster.newDevSession(context,"vip_movie_dev");
     }
 
     public DaoSession getmDaoSession(){

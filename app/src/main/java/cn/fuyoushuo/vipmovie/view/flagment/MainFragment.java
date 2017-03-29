@@ -275,6 +275,12 @@ public class MainFragment extends BaseFragment implements IMainView{
           myRecycleView.setAdapter(newsAdapter);
 
           siteItemAdapter = new SiteItemAdapter();
+          siteItemAdapter.setOnSiteClick(new SiteItemAdapter.OnSiteClick() {
+              @Override
+              public void onClick(View view, SiteItem typeItem) {
+                  RxBus.getInstance().send(new SiteToContentViewEvent(parentFragmentId,typeItem));
+              }
+          });
           siteRview.setHasFixedSize(true);
           final MyGridLayoutManager gridLayoutManager = new MyGridLayoutManager(mactivity,5);
           gridLayoutManager.setAutoMeasureEnabled(true);
@@ -395,29 +401,59 @@ public class MainFragment extends BaseFragment implements IMainView{
   //-------------------------------------总线事件---------------------------------------------------------
    public class toContentViewEvent extends RxBus.BusEvent{
 
-      private NewItem newItem;
+        private NewItem newItem;
 
-      private int parentFragmentId;
+        private int parentFragmentId;
 
-      public toContentViewEvent(NewItem newItem, int parentFragmentId) {
-          this.newItem = newItem;
-          this.parentFragmentId = parentFragmentId;
-      }
+        public toContentViewEvent(NewItem newItem, int parentFragmentId) {
+            this.newItem = newItem;
+            this.parentFragmentId = parentFragmentId;
+        }
 
-      public NewItem getNewItem() {
-          return newItem;
-      }
+        public NewItem getNewItem() {
+            return newItem;
+        }
 
-      public void setNewItem(NewItem newItem) {
-          this.newItem = newItem;
-      }
+        public void setNewItem(NewItem newItem) {
+            this.newItem = newItem;
+        }
 
-      public int getParentFragmentId() {
-          return parentFragmentId;
-      }
+        public int getParentFragmentId() {
+            return parentFragmentId;
+        }
 
-      public void setParentFragmentId(int parentFragmentId) {
-          this.parentFragmentId = parentFragmentId;
-      }
-  }
+        public void setParentFragmentId(int parentFragmentId) {
+            this.parentFragmentId = parentFragmentId;
+        }
+    }
+
+    public class SiteToContentViewEvent extends RxBus.BusEvent{
+
+        private SiteItem siteItem;
+
+        private int parentFragmentId;
+
+        public SiteToContentViewEvent(int parentFragmentId, SiteItem siteItem) {
+            this.parentFragmentId = parentFragmentId;
+            this.siteItem = siteItem;
+        }
+
+        public SiteItem getSiteItem() {
+            return siteItem;
+        }
+
+        public void setSiteItem(SiteItem siteItem) {
+            this.siteItem = siteItem;
+        }
+
+        public int getParentFragmentId() {
+            return parentFragmentId;
+        }
+
+        public void setParentFragmentId(int parentFragmentId) {
+            this.parentFragmentId = parentFragmentId;
+        }
+    }
+
+
 }

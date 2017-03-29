@@ -39,7 +39,7 @@ public class CommonUtils {
         String name = new File(url).getName();
         String endString = "";
         if(name.contains(".")){
-            int end = name.indexOf(".");
+            int end = name.lastIndexOf(".");
             endString = name.substring(end+1,name.length());
             name = name.substring(0,end);
         }

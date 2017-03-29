@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.lzyzsd.jsbridge.BridgeHandler;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
@@ -104,6 +105,8 @@ public class ContentFragment extends BaseFragment {
 
     private static Map<String,String> defaultHeaders = new HashMap<String,String>();
 
+    private boolean isInitPage;
+
     static {
         defaultHeaders.put("User-Agent","Mozilla/5.0 (Linux; Android 6.0; Le X620 Build/HEXCNFN5902012151S) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.91 Mobile Safari/537.36");
     }
@@ -138,6 +141,7 @@ public class ContentFragment extends BaseFragment {
             initArgs(loadType,loadUrl,hisId,keyWord);
             this.parentFragmentId = getArguments().getInt("parentFragmentId",-1);
         }
+        isInitPage = false;
         searchPresenter = new SearchPresenter();
         contentPresenter = new ContentPresenter();
         sessionPresenter = new SessionPresenter();
@@ -225,8 +229,25 @@ public class ContentFragment extends BaseFragment {
             }
         });
 
-
-
+        webView.registerHandler("getFreeResolveData", new BridgeHandler() {
+            @Override
+            public void handler(String data, final CallBackFunction function) {
+               if(TextUtils.isEmpty(data)) return;
+               JSONObject jsonObject = JSONObject.parseObject(data);
+               String input = jsonObject.getString("url");
+               if(TextUtils.isEmpty(input)) return;
+               sessionPresenter.getDataFromFreeResolve(input, new SessionPresenter.FreeResolveCallback() {
+                   @Override
+                   public void onGetFreeResolve(String result, boolean isOk) {
+                         if(isOk){
+                             function.onCallBack(result);
+                         }else{
+                             function.onCallBack("");
+                         }
+                   }
+               });
+            }
+        });
 
         //监听webview下载功能
         webView.setDownloadListener(new DownloadListener() {
@@ -250,7 +271,7 @@ public class ContentFragment extends BaseFragment {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         DownloadManger.getIntance().submitTask(url,title,mimetype);
-                                        Toast.makeText(MyApplication.getContext(), "文件马上开始下载...", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(MyApplication.getContext(), "文件已开始下载", Toast.LENGTH_SHORT).show();
                                     }
                                 })
                         .setNegativeButton("否",
@@ -434,7 +455,9 @@ public class ContentFragment extends BaseFragment {
     @Override
     public void onStart() {
         super.onStart();
-        startPage();
+        if(!isInitPage){
+           startPage();
+        }
     }
 
     /**
@@ -466,6 +489,7 @@ public class ContentFragment extends BaseFragment {
     private void startPage(){
         if(webView != null && !TextUtils.isEmpty(firstLoadUrl)){
             webView.loadUrl(firstLoadUrl);
+            isInitPage = true;
             //webView.loadUrl("file:///android_asset/index.html");
         }
     }

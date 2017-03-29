@@ -11,6 +11,14 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.daimajia.numberprogressbar.NumberProgressBar;
+import com.trello.rxlifecycle.FragmentEvent;
+import com.trello.rxlifecycle.components.support.RxDialogFragment;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cn.fuyoushuo.domain.entity.DownloadTask;
@@ -19,11 +27,6 @@ import cn.fuyoushuo.vipmovie.presenter.impl.DownloadPresenter;
 import cn.fuyoushuo.vipmovie.view.adapter.DownloadAdapter;
 import cn.fuyoushuo.vipmovie.view.layout.DividerItemDecoration;
 import cn.fuyoushuo.vipmovie.view.layout.MyGridLayoutManager;
-import com.daimajia.numberprogressbar.NumberProgressBar;
-import com.trello.rxlifecycle.FragmentEvent;
-import com.trello.rxlifecycle.components.support.RxDialogFragment;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
