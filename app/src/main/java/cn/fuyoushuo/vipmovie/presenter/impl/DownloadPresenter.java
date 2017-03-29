@@ -1,18 +1,15 @@
 package cn.fuyoushuo.vipmovie.presenter.impl;
 
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import cn.fuyoushuo.commonlib.utils.CommonUtils;
 import cn.fuyoushuo.domain.entity.DownloadTask;
 import cn.fuyoushuo.domain.greendao.DownloadTaskDao;
 import cn.fuyoushuo.vipmovie.GreenDaoManger;
 import cn.fuyoushuo.vipmovie.ext.DownloadManger;
 import cn.fuyoushuo.vipmovie.po.DownloadDetail;
+import com.daimajia.numberprogressbar.NumberProgressBar;
+import java.util.ArrayList;
+import java.util.List;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -26,7 +23,7 @@ public class DownloadPresenter extends BasePresenter{
 
 
    //更新下载的VIEW
-   public void updateDownloadView(DownloadTask downloadTask, final ProgressBar progressBar, final TextView downloadInfoText){
+   public void updateDownloadView(DownloadTask downloadTask, final NumberProgressBar progressBar, final TextView downloadInfoText){
        mSubscriptions.add(createDownloadProgressObserver(downloadTask)
              .subscribeOn(Schedulers.io())
              .observeOn(AndroidSchedulers.mainThread())
@@ -61,7 +58,7 @@ public class DownloadPresenter extends BasePresenter{
                     }
                     if(progressBar != null){
                         if(taskState == DownloadDetail.DOWNLOAD_COMPLETE){
-                            progressBar.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.INVISIBLE);
                         }else{
                             progressBar.setProgress(progress);
                         }
@@ -104,7 +101,6 @@ public class DownloadPresenter extends BasePresenter{
     //----------------------------------------接口回调---------------------------------------------------------------------------
 
     public interface FindAllDownloadCallback{
-
         void onAllDownloadsReturn(List<DownloadTask> downloadTasks,boolean isOk);
     }
 

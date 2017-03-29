@@ -9,16 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.trello.rxlifecycle.FragmentEvent;
-import com.trello.rxlifecycle.components.support.RxDialogFragment;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cn.fuyoushuo.domain.entity.DownloadTask;
@@ -27,6 +19,11 @@ import cn.fuyoushuo.vipmovie.presenter.impl.DownloadPresenter;
 import cn.fuyoushuo.vipmovie.view.adapter.DownloadAdapter;
 import cn.fuyoushuo.vipmovie.view.layout.DividerItemDecoration;
 import cn.fuyoushuo.vipmovie.view.layout.MyGridLayoutManager;
+import com.daimajia.numberprogressbar.NumberProgressBar;
+import com.trello.rxlifecycle.FragmentEvent;
+import com.trello.rxlifecycle.components.support.RxDialogFragment;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -67,7 +64,7 @@ public class DownloadDialogFragment extends RxDialogFragment{
         downloadAdapter = new DownloadAdapter();
         downloadAdapter.setDownloadCallback(new DownloadAdapter.DownloadCallback() {
             @Override
-            public void onLoadProgress(ProgressBar progressBar,TextView downloadInfoText,DownloadTask downloadTask) {
+            public void onLoadProgress(NumberProgressBar progressBar,TextView downloadInfoText,DownloadTask downloadTask) {
                 downloadPresenter.updateDownloadView(downloadTask,progressBar,downloadInfoText);
             }
         });
@@ -78,6 +75,8 @@ public class DownloadDialogFragment extends RxDialogFragment{
         gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);
         downloadRview.setLayoutManager(gridLayoutManager);
         downloadRview.setAdapter(downloadAdapter);
+
+
         downloadRview.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayout.VERTICAL));
         return inflate;
     }

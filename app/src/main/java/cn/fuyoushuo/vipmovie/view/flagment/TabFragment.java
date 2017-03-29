@@ -6,21 +6,12 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.jakewharton.rxbinding.view.RxView;
-import com.trello.rxlifecycle.FragmentEvent;
-import com.zhy.android.percent.support.PercentLinearLayout;
-
-import java.util.Observer;
-import java.util.concurrent.TimeUnit;
-
 import butterknife.Bind;
 import cn.fuyoushuo.commonlib.utils.RxBus;
 import cn.fuyoushuo.domain.entity.BookMark;
@@ -29,13 +20,16 @@ import cn.fuyoushuo.domain.entity.UserTrack;
 import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.R;
 import cn.fuyoushuo.vipmovie.ext.AppInfoManger;
-import cn.fuyoushuo.vipmovie.ext.FragmentTagGenerator;
 import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
 import cn.fuyoushuo.vipmovie.po.LoadItem;
 import cn.fuyoushuo.vipmovie.presenter.impl.TabPresenter;
 import cn.fuyoushuo.vipmovie.view.flagment.hisormark.hisFragment;
 import cn.fuyoushuo.vipmovie.view.flagment.hisormark.markFragment;
 import cn.fuyoushuo.vipmovie.view.layout.MenuWindow;
+import com.jakewharton.rxbinding.view.RxView;
+import com.trello.rxlifecycle.FragmentEvent;
+import com.zhy.android.percent.support.PercentLinearLayout;
+import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -170,7 +164,10 @@ public class TabFragment extends BaseFragment{
 
             @Override
             public void onRefreshClick() {
-                 refreshView();
+                //页面刷新
+                 //refreshView();
+                // TODO: 2017/3/29 dubug fix download view
+                DownloadDialogFragment.newInstance().show(getFragmentManager(),"DownloadDialogFragment");
             }
 
             @Override

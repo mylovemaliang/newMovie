@@ -1,26 +1,17 @@
 package cn.fuyoushuo.vipmovie.view.adapter;
 
-import android.content.ComponentName;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cn.fuyoushuo.domain.entity.DownloadTask;
 import cn.fuyoushuo.vipmovie.R;
-import cn.fuyoushuo.vipmovie.po.DownloadDetail;
+import com.daimajia.numberprogressbar.NumberProgressBar;
+import java.text.SimpleDateFormat;
 
 /**
  * Created by QA on 2017/3/27.
@@ -67,8 +58,7 @@ public class DownloadAdapter extends BaseListAdapter<DownloadTask>{
         @Bind(R.id.download_name_text)
         TextView fileName;
 
-        @Bind(R.id.download_progressBar)
-        ProgressBar downloadProgressBar;
+        @Bind(R.id.download_progressBar) NumberProgressBar downloadProgressBar;
 
         public ItemViewHolder(final View itemView) {
             super(itemView);
@@ -77,8 +67,7 @@ public class DownloadAdapter extends BaseListAdapter<DownloadTask>{
     }
 
     public interface DownloadCallback{
-
-        void onLoadProgress(ProgressBar progressBar,TextView downloadInfoText,DownloadTask downloadTask);
+        void onLoadProgress(NumberProgressBar progressBar,TextView downloadInfoText,DownloadTask downloadTask);
 
     }
 }
