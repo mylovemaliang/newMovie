@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ import cn.fuyoushuo.vipmovie.view.adapter.NewsAdapter;
 import cn.fuyoushuo.vipmovie.view.adapter.SiteItemAdapter;
 import cn.fuyoushuo.vipmovie.view.adapter.TypeDataAdapter;
 import cn.fuyoushuo.vipmovie.view.iview.IMainView;
+import cn.fuyoushuo.vipmovie.view.layout.DividerItemDecoration;
 import cn.fuyoushuo.vipmovie.view.layout.MyGridLayoutManager;
 import cn.fuyoushuo.vipmovie.view.layout.MyScrollingView;
 import cn.fuyoushuo.vipmovie.view.layout.NewsItemDecoration;
@@ -80,6 +82,9 @@ public class MainFragment extends BaseFragment implements IMainView{
 
     @Bind(R.id.head_mingyan)
     TextView mingyanText;
+
+    @Bind(R.id.main_head_area)
+    RelativeLayout mainHeadArea;
 
     private int titleAreaHeight;
 
@@ -154,12 +159,14 @@ public class MainFragment extends BaseFragment implements IMainView{
                         if (top.getParent() == topContainer) {
                             topContainer.removeView(top);
                             topEssContainer.addView(top);
+                            top.setBackgroundColor(getResources().getColor(R.color.module_19));
                         }
                     }
                 } else if (isCloseTop && dy < topAreaHeight) {
                     if (top.getParent() == topEssContainer) {
                         topEssContainer.removeView(top);
                         topContainer.addView(top);
+                        top.setBackgroundColor(getResources().getColor(R.color.white));
                     }
                     if (dy < titleAreaHeight) {
                         HeaderTranslate(dy);
@@ -262,7 +269,7 @@ public class MainFragment extends BaseFragment implements IMainView{
           LinearLayoutManager layoutManager = new LinearLayoutManager(mactivity);
 
           layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-          myRecycleView.addItemDecoration(new NewsItemDecoration());
+          myRecycleView.addItemDecoration(new DividerItemDecoration(mactivity,LinearLayoutManager.VERTICAL));
           myRecycleView.setLayoutManager(layoutManager);
           myRecycleView.setNestedScrollingEnabled(true);
           myRecycleView.setAdapter(newsAdapter);

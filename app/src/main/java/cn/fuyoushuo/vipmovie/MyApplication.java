@@ -24,6 +24,7 @@ import com.tencent.smtt.sdk.TbsListener;
 import java.util.Stack;
 
 import cn.fuyoushuo.vipmovie.ext.AppInfoManger;
+import cn.fuyoushuo.vipmovie.ext.DownloadManger;
 import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
 import cn.fuyoushuo.vipmovie.service.InitX5Service;
 import okhttp3.OkHttpClient;
@@ -74,11 +75,13 @@ public class MyApplication extends Application{
         LocalFragmentManger.getIntance().initContext(context);
         GreenDaoManger.getIntance().initContext(context);
         GreenDaoManger.getIntance().initDatabase();
-        //Stetho.initializeWithDefaults(this);
+        Stetho.initializeWithDefaults(this);
         AppInfoManger.getIntance().initContext(this);
-//        new OkHttpClient.Builder()
-//                .addNetworkInterceptor(new StethoInterceptor())
-//                .build();
+        //下载管理器
+        DownloadManger.getIntance().initContext(this);
+        new OkHttpClient.Builder()
+                .addNetworkInterceptor(new StethoInterceptor())
+                .build();
 
 
         //初始化异常拦截器

@@ -24,8 +24,8 @@ public class DownloadTaskDao extends AbstractDao<DownloadTask, Long> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Id = new Property(0, long.class, "id", true, "_id");
-        public final static Property DownloadId = new Property(1, long.class, "downloadId", false, "DOWNLOAD_ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property DownloadId = new Property(1, Long.class, "downloadId", false, "DOWNLOAD_ID");
         public final static Property Url = new Property(2, String.class, "url", false, "URL");
         public final static Property Title = new Property(3, String.class, "title", false, "TITLE");
         public final static Property CreateTime = new Property(4, java.util.Date.class, "createTime", false, "CREATE_TIME");
@@ -45,8 +45,8 @@ public class DownloadTaskDao extends AbstractDao<DownloadTask, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"DOWNLOAD_TASK\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL ," + // 0: id
-                "\"DOWNLOAD_ID\" INTEGER NOT NULL ," + // 1: downloadId
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
+                "\"DOWNLOAD_ID\" INTEGER," + // 1: downloadId
                 "\"URL\" TEXT," + // 2: url
                 "\"TITLE\" TEXT," + // 3: title
                 "\"CREATE_TIME\" INTEGER," + // 4: createTime
@@ -62,8 +62,16 @@ public class DownloadTaskDao extends AbstractDao<DownloadTask, Long> {
     @Override
     protected final void bindValues(DatabaseStatement stmt, DownloadTask entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getId());
-        stmt.bindLong(2, entity.getDownloadId());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
+ 
+        Long downloadId = entity.getDownloadId();
+        if (downloadId != null) {
+            stmt.bindLong(2, downloadId);
+        }
  
         String url = entity.getUrl();
         if (url != null) {
@@ -85,8 +93,16 @@ public class DownloadTaskDao extends AbstractDao<DownloadTask, Long> {
     @Override
     protected final void bindValues(SQLiteStatement stmt, DownloadTask entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getId());
-        stmt.bindLong(2, entity.getDownloadId());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
+ 
+        Long downloadId = entity.getDownloadId();
+        if (downloadId != null) {
+            stmt.bindLong(2, downloadId);
+        }
  
         String url = entity.getUrl();
         if (url != null) {
@@ -107,14 +123,14 @@ public class DownloadTaskDao extends AbstractDao<DownloadTask, Long> {
 
     @Override
     public Long readKey(Cursor cursor, int offset) {
-        return cursor.getLong(offset + 0);
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     @Override
     public DownloadTask readEntity(Cursor cursor, int offset) {
         DownloadTask entity = new DownloadTask( //
-            cursor.getLong(offset + 0), // id
-            cursor.getLong(offset + 1), // downloadId
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // downloadId
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // url
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // title
             cursor.isNull(offset + 4) ? null : new java.util.Date(cursor.getLong(offset + 4)), // createTime
@@ -125,8 +141,8 @@ public class DownloadTaskDao extends AbstractDao<DownloadTask, Long> {
      
     @Override
     public void readEntity(Cursor cursor, DownloadTask entity, int offset) {
-        entity.setId(cursor.getLong(offset + 0));
-        entity.setDownloadId(cursor.getLong(offset + 1));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setDownloadId(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
         entity.setUrl(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setTitle(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setCreateTime(cursor.isNull(offset + 4) ? null : new java.util.Date(cursor.getLong(offset + 4)));
@@ -150,7 +166,7 @@ public class DownloadTaskDao extends AbstractDao<DownloadTask, Long> {
 
     @Override
     public boolean hasKey(DownloadTask entity) {
-        throw new UnsupportedOperationException("Unsupported for entities with a non-null key");
+        return entity.getId() != null;
     }
 
     @Override

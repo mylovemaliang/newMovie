@@ -35,6 +35,23 @@ public class CommonUtils {
         return url.substring(0,size)+"...";
     }
 
+    public static String getShortTitleForDownload(String url){
+        String name = new File(url).getName();
+        String endString = "";
+        if(name.contains(".")){
+            int end = name.indexOf(".");
+            endString = name.substring(end+1,name.length());
+            name = name.substring(0,end);
+        }
+        if(name.length() <= 16){
+            return name+"."+endString;
+        }else{
+            String before = name.substring(0,8);
+            String after = name.substring(name.length()-9,name.length());
+            return before+"..."+after+"."+endString;
+        }
+    }
+
     /**
      * 字符串格式化为字符串数组
      * @param itemsstring

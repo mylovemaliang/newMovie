@@ -1,15 +1,13 @@
 package cn.fuyoushuo.vipmovie.view.flagment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -19,6 +17,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONObject;
+import com.github.lzyzsd.jsbridge.BridgeHandler;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.jakewharton.rxbinding.view.RxView;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
@@ -27,6 +27,7 @@ import com.tencent.smtt.export.external.interfaces.SslErrorHandler;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.CookieManager;
+import com.tencent.smtt.sdk.DownloadListener;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
@@ -36,29 +37,25 @@ import com.zhy.android.percent.support.PercentLinearLayout;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.net.URL;
 import java.net.URLEncoder;
-import java.net.UnknownServiceException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import cn.fuyoushuo.commonlib.utils.CommonUtils;
 import cn.fuyoushuo.commonlib.utils.MD5;
-import cn.fuyoushuo.commonlib.utils.RxBus;
 import cn.fuyoushuo.domain.entity.BookMark;
 import cn.fuyoushuo.domain.entity.UserTrack;
 import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.R;
 import cn.fuyoushuo.vipmovie.ext.AppInfoManger;
+import cn.fuyoushuo.vipmovie.ext.DownloadManger;
 import cn.fuyoushuo.vipmovie.po.LoadItem;
 import cn.fuyoushuo.vipmovie.presenter.impl.ContentPresenter;
 import cn.fuyoushuo.vipmovie.presenter.impl.SearchPresenter;
+import cn.fuyoushuo.vipmovie.presenter.impl.SessionPresenter;
 import cn.fuyoushuo.vipmovie.view.X5View.X5BridgeUtils;
 import cn.fuyoushuo.vipmovie.view.X5View.X5BridgeWebView;
 import cn.fuyoushuo.vipmovie.view.X5View.X5BridgeWebViewClient;
@@ -117,6 +114,8 @@ public class ContentFragment extends BaseFragment {
 
     ContentPresenter contentPresenter;
 
+    SessionPresenter sessionPresenter;
+
 
     @Override
     protected String getPageName() {
@@ -141,6 +140,7 @@ public class ContentFragment extends BaseFragment {
         }
         searchPresenter = new SearchPresenter();
         contentPresenter = new ContentPresenter();
+        sessionPresenter = new SessionPresenter();
     }
 
     private void initArgs(int loadType,String loadUrl,Long hisId ,String keyWord) {
@@ -198,6 +198,83 @@ public class ContentFragment extends BaseFragment {
         if(Build.VERSION.SDK_INT <= 18){
             webSetting.setSavePassword(false);
         }
+
+        webView.registerHandler("getSession", new BridgeHandler() {
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                String sessionFromLocal = sessionPresenter.getSessionFromLocal();
+                function.onCallBack(sessionFromLocal);
+            }
+        });
+
+        webView.registerHandler("vipkdyGetDataFormJavaScript", new BridgeHandler() {
+            @Override
+            public void handler(String data, final CallBackFunction function) {
+                 if(TextUtils.isEmpty(data)) return;
+                 JSONObject jsonObject = JSONObject.parseObject(data);
+                 String url = jsonObject.getString("url");
+                 if(TextUtils.isEmpty(url)) return;
+                 sessionPresenter.getDataFromJs(url, new SessionPresenter.DataGetCallback() {
+                     @Override
+                     public void onGetData(String result, boolean isOk) {
+                           if(isOk){
+                               function.onCallBack(result);
+                           }
+                     }
+                 });
+            }
+        });
+
+
+
+
+        //监听webview下载功能
+        webView.setDownloadListener(new DownloadListener() {
+            /**
+             * Notify the host application that a file should be downloaded
+             * @param url The full url to the content that should be downloaded
+             * @param userAgent the user agent to be used for the download.
+             * @param contentDisposition Content-disposition http header, if
+             *                           present.
+             * @param mimetype The mimetype of the content reported by the server
+             * @param contentLength The file size reported by the server
+             */
+            @Override
+            public void onDownloadStart(final String url, String userAgent, final String contentDisposition, final String mimetype, long contentLength) {
+                final String title = CommonUtils.getShortTitleForDownload(url);
+                new AlertDialog.Builder(mactivity)
+                        .setTitle("是否下载"+title)
+                        .setPositiveButton("是",
+                                new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        DownloadManger.getIntance().submitTask(url,title,mimetype);
+                                        Toast.makeText(MyApplication.getContext(), "文件马上开始下载...", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                        .setNegativeButton("否",
+                                new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog,
+                                                        int which) {
+                                        // TODO Auto-generated method stub
+                                        dialog.dismiss();
+                                    }
+                                })
+                        .setOnCancelListener(
+                                new DialogInterface.OnCancelListener() {
+
+                                    @Override
+                                    public void onCancel(DialogInterface dialog) {
+                                        // TODO Auto-generated method stub
+                                        dialog.dismiss();
+                                    }
+                                }).show();
+            }
+
+        });
 
 
         webView.setWebChromeClient(new WebChromeClient(){
@@ -570,6 +647,9 @@ public class ContentFragment extends BaseFragment {
         }
         if(contentPresenter != null){
             contentPresenter.onDestroy();
+        }
+        if(sessionPresenter != null){
+            sessionPresenter.onDestroy();
         }
     }
 }

@@ -181,8 +181,9 @@ public class TabFragment extends BaseFragment{
                         .subscribe(new Action1<Long>() {
                             @Override
                             public void call(Long aLong) {
-                                MyApplication.getMyapplication().finishAllActivity();
-                                MyApplication.getMyapplication().finishProgram();
+//                                MyApplication.getMyapplication().finishAllActivity();
+//                                MyApplication.getMyapplication().finishProgram();
+                                  DownloadDialogFragment.newInstance().show(getFragmentManager(),"DownloadDialogFragment");
                             }
                         });
             }

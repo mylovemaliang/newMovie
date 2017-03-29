@@ -17,6 +17,8 @@ import cn.fuyoushuo.commonlib.utils.Constants;
 import cn.fuyoushuo.domain.httpservice.BaiduHttpService;
 import cn.fuyoushuo.domain.httpservice.FqbbHttpService;
 import cn.fuyoushuo.domain.httpservice.NewsHttpService;
+import cn.fuyoushuo.domain.httpservice.VipkdyHttpService;
+import cn.fuyoushuo.domain.httpservice.VipwwwHttpService;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.Connection;
@@ -114,6 +116,12 @@ public class ServiceManager {
         }
         if(t.getName().equals(BaiduHttpService.class.getName())){
             endPoint = Constants.ENDPOINT_BAIDU;
+        }
+        if(t.getName().equals(VipkdyHttpService.class.getName())){
+            endPoint = Constants.ENDPOINT_VIPKDY;
+        }
+        if(t.getName().equals(VipwwwHttpService.class.getName())){
+            endPoint = Constants.ENDPOINT_WWW_VIP;
         }
         if ("".equals(endPoint)) {
             throw new IllegalArgumentException("Error: Can't get end point url. Please configure at the method " + ServiceManager.class.getSimpleName() + ".getEndPoint(T t)");

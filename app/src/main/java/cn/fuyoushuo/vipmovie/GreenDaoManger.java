@@ -41,7 +41,7 @@ public class GreenDaoManger {
          db = mHelper.getWritableDatabase();
          mDaoMaster = new DaoMaster(db);
          //这里新建多个session,对应一个数据库连接
-         mDaoSession = mDaoMaster.newSession();
+         mDaoSession = mDaoMaster.newDevSession(context,"vip_movie_dev");
     }
 
     public DaoSession getmDaoSession(){

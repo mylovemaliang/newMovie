@@ -21,6 +21,7 @@ import cn.fuyoushuo.domain.entity.NewItem;
 import cn.fuyoushuo.domain.entity.SiteItem;
 import cn.fuyoushuo.domain.httpservice.FqbbHttpService;
 import cn.fuyoushuo.domain.httpservice.NewsHttpService;
+import cn.fuyoushuo.domain.httpservice.VipkdyHttpService;
 import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.ServiceManager;
 import cn.fuyoushuo.vipmovie.view.iview.IMainView;
@@ -138,7 +139,8 @@ public class MainPresenter extends BasePresenter {
      * 获取头部网站信息
      */
     public void getHeadSites(){
-        mSubscriptions.add(createSitesObserver()
+        mSubscriptions.add(ServiceManager.createService(VipkdyHttpService.class)
+             .getHomeSiteInfo()
              .subscribeOn(Schedulers.io())
              .observeOn(AndroidSchedulers.mainThread())
              .subscribe(new Subscriber<List<SiteItem>>() {

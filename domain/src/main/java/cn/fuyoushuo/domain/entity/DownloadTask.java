@@ -5,6 +5,7 @@ import org.greenrobot.greendao.annotation.Id;
 
 import java.util.Date;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Transient;
 
 /**
  * Created by maliang on 2017/3/26.
@@ -13,9 +14,9 @@ import org.greenrobot.greendao.annotation.Generated;
 public class DownloadTask{
 
     @Id(autoincrement = true)
-    private long id;
+    private Long id;
 
-    private long downloadId;
+    private Long downloadId;
 
     private String url;
 
@@ -23,11 +24,21 @@ public class DownloadTask{
 
     private Date createTime;
 
-    // 1：进行中 2：已完成
+    // 1：进行中 2:暂停  3:下载完毕
     private int taskState;
 
-    @Generated(hash = 335457743)
-    public DownloadTask(long id, long downloadId, String url, String title,
+    @Transient
+    private float totalMbs;
+
+    @Transient
+    private float currentMbs;
+
+    //下载进度
+    @Transient
+    private int progress = 0;
+
+    @Generated(hash = 1080514263)
+    public DownloadTask(Long id, Long downloadId, String url, String title,
             Date createTime, int taskState) {
         this.id = id;
         this.downloadId = downloadId;
@@ -41,19 +52,19 @@ public class DownloadTask{
     public DownloadTask() {
     }
 
-    public long getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public long getDownloadId() {
+    public Long getDownloadId() {
         return this.downloadId;
     }
 
-    public void setDownloadId(long downloadId) {
+    public void setDownloadId(Long downloadId) {
         this.downloadId = downloadId;
     }
 
@@ -87,5 +98,29 @@ public class DownloadTask{
 
     public void setTaskState(int taskState) {
         this.taskState = taskState;
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+
+    public float getTotalMbs() {
+        return totalMbs;
+    }
+
+    public void setTotalMbs(float totalMbs) {
+        this.totalMbs = totalMbs;
+    }
+
+    public float getCurrentMbs() {
+        return currentMbs;
+    }
+
+    public void setCurrentMbs(float currentMbs) {
+        this.currentMbs = currentMbs;
     }
 }

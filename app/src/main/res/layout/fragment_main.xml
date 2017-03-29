@@ -17,7 +17,8 @@
 
                     <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="160dp">
+                        android:layout_height="120dp"
+                        android:id="@+id/main_head_area">
 
                         <ImageView
                             android:layout_width="match_parent"
@@ -31,7 +32,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="25dp"
-                            android:layout_marginTop="35dp"
+                            android:layout_marginTop="20dp"
                             android:textSize="17sp"
                             android:text="真理惟一可靠的标准就是永远自相符合." />
 
@@ -40,7 +41,7 @@
                             android:layout_height="60dp"
                             android:background="@color/zxing_transparent"
                             android:id="@+id/title_container"
-                            android:layout_marginBottom="11dp"
+                            android:layout_marginBottom="5dp"
                             android:layout_alignParentBottom="true"
                             android:layout_alignParentLeft="true"
                             android:layout_alignParentStart="true">
@@ -48,8 +49,8 @@
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_height="0dp"
-                                app:layout_widthPercent="80%w"
-                                app:layout_heightPercent="70%h"
+                                app:layout_widthPercent="92%w"
+                                app:layout_heightPercent="60%h"
                                 android:background="@drawable/textborder"
                                 android:text="搜索或输入网址"
                                 android:gravity="center"
@@ -63,27 +64,38 @@
 
                     <android.support.v7.widget.RecyclerView
                         android:layout_width="match_parent"
-                        android:layout_height="180dp"
+                        android:layout_height="wrap_content"
                         android:id="@+id/sites_area"
                         android:background="@color/white"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
+                        android:layout_height="1px"
+                        android:background="@color/gray"></LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="50dp"
+                        android:orientation="vertical"
                         android:id="@+id/top_container">
                         <android.support.v7.widget.RecyclerView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:id="@+id/top"
-                            android:background="@color/module_19" />
+                            android:background="@color/white" />
                     </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="1px"
+                        android:background="@color/gray"></LinearLayout>
 
                      <android.support.v7.widget.RecyclerView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
                         android:id="@+id/main_bottomRcycleView"
-                        android:background="@color/module_19"
-                         >
+                        android:background="@color/white">
                     </android.support.v7.widget.RecyclerView>
 
                 </LinearLayout>

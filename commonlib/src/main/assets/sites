@@ -1,9 +1,9 @@
 [
- {name:"乐视网",imgUrl:"asset:///images/letv.png",contentUrl:""}
- {name:"芒果网",imgUrl:"asset:///images/mangguo.png",contentUrl:""}
- {name:"pptv",imgUrl:"asset:///images/pptv.png",contentUrl:""}
- {name:"爱奇艺",imgUrl:"asset:///images/qiy.png",contentUrl:""}
- {name:"搜狐视频",imgUrl:"asset:///images/souhu.png",contentUrl:""}
- {name:"淘宝",imgUrl:"asset:///images/taobao.png",contentUrl:""}
- {name:"优酷",imgUrl:"asset:///images/youku.png",contentUrl:""}
+ {name:"乐视网",img:"asset:///images/letv.png",url:""}
+ {name:"芒果网",img:"asset:///images/mangguo.png",url:""}
+ {name:"pptv",img:"asset:///images/pptv.png",url:""}
+ {name:"爱奇艺",img:"asset:///images/qiy.png",url:""}
+ {name:"搜狐视频",img:"asset:///images/souhu.png",url:""}
+ {name:"淘宝",img:"asset:///images/taobao.png",url:""}
+ {name:"优酷",img:"asset:///images/youku.png",url:""}
 ]

@@ -26,6 +26,11 @@ public class Constants {
 
     public static final String ENDPOINT_BAIDU="http://www.baidu.com";
 
+    public static final String ENDPOINT_VIPKDY="http://s.vipkdy.cn";
+
+    //test
+    public static final String ENDPOINT_WWW_VIP = "http://192.168.31.105";
+
 
 
     //测试

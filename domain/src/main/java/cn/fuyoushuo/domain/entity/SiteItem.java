@@ -10,9 +10,17 @@ public class SiteItem implements Serializable{
 
     private String name;
 
-    private String imgUrl;
+    private String url;
 
-    private String contentUrl;
+    private String img;
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
 
     public String getName() {
         return name;
@@ -22,19 +30,11 @@ public class SiteItem implements Serializable{
         this.name = name;
     }
 
-    public String getContentUrl() {
-        return contentUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setContentUrl(String contentUrl) {
-        this.contentUrl = contentUrl;
-    }
-
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

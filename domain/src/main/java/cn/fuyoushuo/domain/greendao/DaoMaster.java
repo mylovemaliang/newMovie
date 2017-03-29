@@ -24,8 +24,8 @@ public class DaoMaster extends AbstractDaoMaster {
         BookMarkDao.createTable(db, ifNotExists);
         HistoryItemDao.createTable(db, ifNotExists);
         StaticDataDao.createTable(db, ifNotExists);
-        DownloadTaskDao.createTable(db, ifNotExists);
         UserTrackDao.createTable(db, ifNotExists);
+        DownloadTaskDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
@@ -33,8 +33,8 @@ public class DaoMaster extends AbstractDaoMaster {
         BookMarkDao.dropTable(db, ifExists);
         HistoryItemDao.dropTable(db, ifExists);
         StaticDataDao.dropTable(db, ifExists);
-        DownloadTaskDao.dropTable(db, ifExists);
         UserTrackDao.dropTable(db, ifExists);
+        DownloadTaskDao.dropTable(db, ifExists);
     }
 
     /**
@@ -56,8 +56,8 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(BookMarkDao.class);
         registerDaoClass(HistoryItemDao.class);
         registerDaoClass(StaticDataDao.class);
-        registerDaoClass(DownloadTaskDao.class);
         registerDaoClass(UserTrackDao.class);
+        registerDaoClass(DownloadTaskDao.class);
     }
 
     public DaoSession newSession() {

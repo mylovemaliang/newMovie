@@ -29,7 +29,7 @@ public class NewsAdapter extends BaseListAdapter<NewItem>{
 
     public static int ITEM_VIEW_TYPE_IMAGES_3 = 2;
 
-    public static int ITEM_VIEW_TYPE_FOOTER = 3;
+    public static int ITEM_VIEW_TYPE_FOOTER = 100;
 
     public static int ITEM_VIEW_NULL = 4;
 

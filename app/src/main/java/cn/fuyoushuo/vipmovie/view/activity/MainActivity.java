@@ -21,10 +21,12 @@ import cn.fuyoushuo.domain.entity.TabItem;
 import cn.fuyoushuo.vipmovie.GreenDaoManger;
 import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.R;
+import cn.fuyoushuo.vipmovie.ext.AppInfoManger;
 import cn.fuyoushuo.vipmovie.ext.BitmapManger;
 import cn.fuyoushuo.vipmovie.ext.FragmentTagGenerator;
 import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
 import cn.fuyoushuo.vipmovie.ext.Pair;
+import cn.fuyoushuo.vipmovie.presenter.impl.SessionPresenter;
 import cn.fuyoushuo.vipmovie.view.flagment.SwipeDialogFragment;
 import cn.fuyoushuo.vipmovie.view.flagment.TabFragment;
 import rx.Subscriber;
@@ -44,6 +46,8 @@ public class MainActivity extends BaseActivity{
 
     List<TabFragment> backFragments = new ArrayList<TabFragment>();
 
+    SessionPresenter sessionPresenter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,8 +55,23 @@ public class MainActivity extends BaseActivity{
         getWindow().setFormat(PixelFormat.TRANSLUCENT);
         fragmentManager = getSupportFragmentManager();
         mSubscriptions = new CompositeSubscription();
+        sessionPresenter = new SessionPresenter();
         initFragment();
         initBusEvent();
+        initSaveSession();
+    }
+
+    private void initSaveSession(){
+        boolean sessionExist = AppInfoManger.getIntance().isSessionExist();
+        if(!sessionExist){
+            sessionPresenter.getSessionForCookie(new SessionPresenter.SessionGetCallback() {
+
+                @Override
+                public void onGetSession(String sessionResult, boolean isOk) {
+                    AppInfoManger.getIntance().saveVipCookieSession(sessionResult);
+                }
+            });
+        }
     }
 
     private void initFragment(){
@@ -235,6 +254,9 @@ public class MainActivity extends BaseActivity{
         super.onDestroy();
         if(mSubscriptions.hasSubscriptions()){
             mSubscriptions.unsubscribe();
+        }
+        if(sessionPresenter != null){
+            sessionPresenter.onDestroy();
         }
     }
 }

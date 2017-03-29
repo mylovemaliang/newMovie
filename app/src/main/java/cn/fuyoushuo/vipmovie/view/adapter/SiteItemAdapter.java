@@ -55,7 +55,7 @@ public class SiteItemAdapter extends BaseListAdapter<SiteItem>{
             }
         });
         currentHolder.siteName.setText(item.getName());
-        currentHolder.siteImage.setImageURI(Uri.parse(item.getImgUrl()));
+        currentHolder.siteImage.setImageURI(Uri.parse(item.getImg()));
     }
 
     public class ItemViewHolder extends RecyclerView.ViewHolder{

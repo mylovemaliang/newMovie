@@ -10,6 +10,7 @@ import android.util.TypedValue;
 import android.view.View;
 
 import cn.fuyoushuo.vipmovie.R;
+import cn.fuyoushuo.vipmovie.view.adapter.NewsAdapter;
 
 public class DividerItemDecoration extends RecyclerView.ItemDecoration{
 
@@ -37,7 +38,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration{
       * @param context
       * @param orientation
       */
-     public DividerItemDecoration(Context context, int orientation) {
+     public DividerItemDecoration(Context context,int orientation) {
          this.mOrientation = orientation;
          if(orientation != LinearLayoutManager.VERTICAL && orientation != LinearLayoutManager.HORIZONTAL){
              throw new IllegalArgumentException("请传入正确的参数") ;
@@ -103,6 +104,8 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration{
       */
      @Override
      public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+         RecyclerView.ViewHolder childViewHolder = parent.getChildViewHolder(view);
+         if(childViewHolder.getItemViewType() == NewsAdapter.ITEM_VIEW_TYPE_FOOTER) return;
          if(mOrientation == LinearLayoutManager.VERTICAL){
              outRect.set(0,0,0,mItemSize);
          }else {
