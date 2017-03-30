@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="70dp"
     android:background="@color/white"
-    android:padding="8dp"
-    >
+    android:padding="8dp">
 
   <ImageView
       android:id="@+id/iv_icon"
@@ -24,8 +23,7 @@
       android:orientation="vertical"
       app:layout_heightPercent="100%h"
       app:layout_marginLeftPercent="2%w"
-      app:layout_widthPercent="90%w"
-      >
+      app:layout_widthPercent="90%w">
 
     <TextView
         android:id="@+id/download_name_text"
@@ -33,8 +31,7 @@
         android:layout_height="0dp"
         android:textSize="14sp"
         app:layout_heightPercent="30%h"
-        app:layout_widthPercent="100%w"
-        />
+        app:layout_widthPercent="100%w"/>
 
 
     <com.daimajia.numberprogressbar.NumberProgressBar
@@ -44,8 +41,7 @@
         app:layout_heightPercent="20%h"
         app:layout_widthPercent="100%w"
         app:layout_marginTopPercent="10%h"
-        style="@style/NumberProgressBar_Default"
-        />
+        style="@style/NumberProgressBar_Default" />
 
     <TextView
         android:id="@+id/download_info_text"
@@ -55,8 +51,7 @@
         android:gravity="left|center_vertical"
         android:textSize="12sp"
         app:layout_heightPercent="40%h"
-        app:layout_widthPercent="100%w"
-        />
+        app:layout_widthPercent="100%w"/>
 
   </com.zhy.android.percent.support.PercentLinearLayout>
 

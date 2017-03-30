@@ -17,23 +17,25 @@
 
                     <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="120dp"
+                        android:layout_height="140dp"
+                        android:background="@color/c1"
                         android:id="@+id/main_head_area">
 
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="fitXY"
-                            android:src="@mipmap/backgroud"
-                            android:id="@+id/topImage"/>
+                        <!--<ImageView-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="match_parent"-->
+                            <!--android:scaleType="fitXY"-->
+                            <!--android:src="@mipmap/backgroud"-->
+                            <!--android:id="@+id/topImage"/>-->
 
                         <TextView
                             android:id="@+id/head_mingyan"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="25dp"
-                            android:layout_marginTop="20dp"
-                            android:textSize="17sp"
+                            android:layout_marginTop="30dp"
+                            android:textSize="15sp"
+                            android:textColor="@color/white"
                             android:text="真理惟一可靠的标准就是永远自相符合." />
 
                         <com.zhy.android.percent.support.PercentRelativeLayout
@@ -46,17 +48,43 @@
                             android:layout_alignParentLeft="true"
                             android:layout_alignParentStart="true">
 
-                            <TextView
+                            <com.zhy.android.percent.support.PercentLinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="0dp"
-                                app:layout_widthPercent="92%w"
-                                app:layout_heightPercent="60%h"
+                                app:layout_heightPercent="70%"
+                                app:layout_widthPercent="95%"
+                                android:orientation="horizontal"
                                 android:background="@drawable/textborder"
-                                android:text="搜索或输入网址"
-                                android:gravity="center"
-                                android:textSize="16sp"
-                                android:id="@+id/title"
-                                android:layout_centerInParent="true"/>
+                                android:layout_centerVertical="true"
+                                android:layout_centerHorizontal="true"
+                                android:id="@+id/title">
+
+                                <RelativeLayout
+                                    android:layout_width="0dp"
+                                    app:layout_widthPercent="15%w"
+                                    android:layout_height="match_parent"
+                                    android:id="@+id/edit_clear_area">
+
+                                    <ImageView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:src="@mipmap/search"
+                                        android:id="@+id/head_image"
+                                        android:layout_centerInParent="true"/>
+                                </RelativeLayout>
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    app:layout_widthPercent="85%w"
+                                    android:layout_height="match_parent"
+                                    android:background="@null"
+                                    android:textSize="14sp"
+                                    android:singleLine="true"
+                                    android:gravity="left|center_vertical"
+                                    android:hint="搜索或输入网址"
+                                    android:textCursorDrawable="@null"
+                                    android:id="@+id/content_searchText"/>
+                            </com.zhy.android.percent.support.PercentLinearLayout>
 
                         </com.zhy.android.percent.support.PercentRelativeLayout>
 
@@ -70,11 +98,12 @@
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="1px"
-                        android:background="@color/gray"></LinearLayout>
+                        android:layout_height="15dp"
+                        android:background="@color/module_19"></LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
+                        android:layout_height="40dp"
                         android:orientation="vertical"
                         android:id="@+id/top_container">
                         <android.support.v7.widget.RecyclerView

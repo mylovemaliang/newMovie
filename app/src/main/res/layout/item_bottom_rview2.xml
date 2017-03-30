@@ -20,16 +20,18 @@
 
             <TextView
                 android:id="@+id/news3_title"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="为什么说彪悍的俄罗斯人是“战斗民族“?"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
                 android:textStyle="normal"
-                android:textSize="15sp"
-                android:typeface="serif"
+                android:textSize="16sp"
+                android:typeface="normal"
                 android:textColor="@color/black"
-                android:gravity="left"/>
+                android:gravity="left"
+                android:maxLines="2"
+                android:ellipsize="end"/>
 
         </com.zhy.android.percent.support.PercentLinearLayout>
 

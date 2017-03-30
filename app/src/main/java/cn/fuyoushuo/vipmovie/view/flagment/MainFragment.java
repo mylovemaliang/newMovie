@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.jakewharton.rxbinding.view.RxView;
 import com.trello.rxlifecycle.FragmentEvent;
+import com.zhy.android.percent.support.PercentLinearLayout;
 import com.zhy.android.percent.support.PercentRelativeLayout;
 
 import java.util.List;
@@ -53,11 +54,11 @@ public class MainFragment extends BaseFragment implements IMainView{
     @Bind(R.id.scrollView)
     MyScrollingView myScrollingView;
 
-    @Bind(R.id.topImage)
-    ImageView topImageView;
+//    @Bind(R.id.topImage)
+//    ImageView topImageView;
 
     @Bind(R.id.title)
-    TextView title;
+    PercentLinearLayout title;
 
     @Bind(R.id.top)
     RecyclerView top;
@@ -290,7 +291,7 @@ public class MainFragment extends BaseFragment implements IMainView{
           siteRview.setAdapter(siteItemAdapter);
 
           //设置首页字体
-          initMingyanFront();
+          //initMingyanFront();
 
     }
 
@@ -339,8 +340,8 @@ public class MainFragment extends BaseFragment implements IMainView{
     }
 
     private void HeaderTranslate(float distance) {
-        topImageView.setTranslationY(-distance);
-        topImageView.setTranslationY(distance/2);
+//        topImageView.setTranslationY(-distance);
+//        topImageView.setTranslationY(distance/2);
     }
 
     @Override

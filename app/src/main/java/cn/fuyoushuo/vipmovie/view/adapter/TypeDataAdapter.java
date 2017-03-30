@@ -79,9 +79,9 @@ public class TypeDataAdapter extends BaseListAdapter<NewType>{
         });
         currentHolder.cateName.setText(item.getTypeName());
         if(item.isRed()){
-            currentHolder.cateName.setTextColor(MyApplication.getContext().getResources().getColor(R.color.module_11));
+            currentHolder.cateName.setTextColor(MyApplication.getContext().getResources().getColor(R.color.module_2));
         }else{
-            currentHolder.cateName.setTextColor(MyApplication.getContext().getResources().getColor(R.color.darkBackground));
+            currentHolder.cateName.setTextColor(MyApplication.getContext().getResources().getColor(R.color.smallBlack));
         }
     }
 

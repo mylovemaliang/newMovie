@@ -25,13 +25,17 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration{
      /**
       * item之间分割线的size，默认为1
       */
-     private int mItemSize = 1 ;
+     private int mItemSize = 1;
 
      /**
       * 绘制item分割线的画笔，和设置其属性
       * 来绘制个性分割线
       */
      private Paint mPaint ;
+
+     private int color = R.color.module_20;
+
+     private Context context;
 
      /**
       * 构造方法传入布局方向，不可不传
@@ -43,11 +47,18 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration{
          if(orientation != LinearLayoutManager.VERTICAL && orientation != LinearLayoutManager.HORIZONTAL){
              throw new IllegalArgumentException("请传入正确的参数") ;
          }
-         mItemSize = (int) TypedValue.applyDimension(mItemSize, TypedValue.COMPLEX_UNIT_DIP,context.getResources().getDisplayMetrics());
+         this.context = context;
+         //mItemSize = (int) TypedValue.applyDimension(mItemSize, TypedValue.COMPLEX_UNIT_DIP,context.getResources().getDisplayMetrics());
          mPaint = new Paint(Paint.ANTI_ALIAS_FLAG) ;
-         mPaint.setColor(context.getResources().getColor(R.color.darkBackground));
+         mPaint.setColor(context.getResources().getColor(this.color));
          /*设置填充*/
          mPaint.setStyle(Paint.Style.FILL);
+     }
+
+     public DividerItemDecoration bindColor(int color){
+         this.color = color;
+         mPaint.setColor(context.getResources().getColor(this.color));
+         return this;
      }
 
      @Override
@@ -71,8 +82,8 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration{
          for(int i = 0 ; i < childSize ; i ++){
              final View child = parent.getChildAt( i ) ;
              RecyclerView.LayoutParams layoutParams = (RecyclerView.LayoutParams) child.getLayoutParams();
-             final int top = child.getBottom() + layoutParams.bottomMargin ;
-             final int bottom = top + mItemSize ;
+             final float top = child.getBottom() + layoutParams.bottomMargin ;
+             final float bottom = top + mItemSize ;
              canvas.drawRect(left,top,right,bottom,mPaint);
          }
      }

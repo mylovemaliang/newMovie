@@ -10,6 +10,7 @@
         android:layout_below="@+id/site_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:textColor="@color/black"
         android:text="####"
         android:layout_centerHorizontal="true"
         android:textSize="12sp"

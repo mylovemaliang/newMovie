@@ -64,6 +64,9 @@ public class MenuWindow extends PopupWindow {
     @Bind(R.id.menu_exit)
     PercentLinearLayout exitArea;
 
+    @Bind(R.id.menu_download)
+    PercentLinearLayout downloadArea;
+
     @Bind(R.id.no_pic_image)
     ImageView noPicImage;
 
@@ -155,6 +158,17 @@ public class MenuWindow extends PopupWindow {
                     }
                 });
 
+        RxView.clicks(downloadArea).throttleFirst(1000,TimeUnit.MILLISECONDS)
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void aVoid) {
+                        if(onItemClick != null){
+                            onItemClick.onDownload();
+                        }
+                        dismissWindow();
+                    }
+                });
+
         RxView.clicks(downArea).throttleFirst(1000,TimeUnit.MILLISECONDS)
                 .subscribe(new Action1<Void>() {
                     @Override
@@ -233,6 +247,9 @@ public class MenuWindow extends PopupWindow {
 
         //点击退出
         void onExit();
+
+        //点击下载管理
+        void onDownload();
     }
 
     @Override
