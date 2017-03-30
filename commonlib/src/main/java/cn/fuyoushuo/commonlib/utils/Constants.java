@@ -26,9 +26,14 @@ public class Constants {
 
     public static final String ENDPOINT_BAIDU="http://www.baidu.com";
 
-    public static final String ENDPOINT_VIPKDY="http://www.sviphome.com";
+//    public static final String ENDPOINT_VIPKDY="http://www.sviphome.com";
+//
+//    public static final String ENDPOINT_WWW_VIP = "http://www.sviphome.com";
 
-    public static final String ENDPOINT_WWW_VIP = "http://www.sviphome.com";
+    //test
+    public static final String ENDPOINT_VIPKDY="http://180.76.146.164:8085";
+
+    public static final String ENDPOINT_WWW_VIP = "http://180.76.146.164:8085";
 
     //--------------------------------自由解析变量----------------------------------------------------
 

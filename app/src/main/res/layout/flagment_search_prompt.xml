@@ -1,15 +1,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/module_19"
+    android:background="@color/module_21"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.zhy.android.percent.support.PercentRelativeLayout
         android:id="@+id/search_prompt_flagment_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@android:color/white"
-        android:elevation="4dp">
+        android:layout_height="50dp"
+        android:background="@color/module_22">
 
         <RelativeLayout
             android:layout_width="0dp"
@@ -20,7 +19,7 @@
            <ImageView
                android:layout_width="wrap_content"
                android:layout_height="wrap_content"
-               android:src="@mipmap/back"
+               android:src="@mipmap/white_back"
                android:layout_centerInParent="true" />
         </RelativeLayout>
 
@@ -58,7 +57,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/close_edit"
+                    android:src="@mipmap/white_close"
                     android:layout_centerInParent="true"/>
             </RelativeLayout>
 
@@ -76,7 +75,6 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text="搜索"
-                android:textColor="@color/module_6"
                 android:textSize="16sp"
                 android:id="@+id/search_prompt_flagment_search"/>
         </RelativeLayout>
@@ -89,8 +87,7 @@
         android:layout_height="match_parent"
         android:id="@+id/search_promt_result_area"
         android:layout_below="@id/search_prompt_flagment_toolbar"
-        android:background="@color/white"
-        android:layout_marginTop="5dp">
+        android:layout_marginTop="10dp">
 
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"

@@ -125,9 +125,9 @@
 
     </com.zhy.android.percent.support.PercentLinearLayout>
 
-    <!--退出-->
+    <!--下载管理-->
     <com.zhy.android.percent.support.PercentLinearLayout
-        android:id="@+id/menu_exit"
+        android:id="@+id/menu_download"
         android:layout_width="0dp"
         android:layout_height="90dp"
         app:layout_widthPercent="20%w"
@@ -140,13 +140,13 @@
             app:layout_widthPercent="60%w"
             app:layout_heightPercent="35%h"
             android:layout_gravity="center_horizontal"
-            android:src="@mipmap/exit"
+            android:src="@mipmap/download"
             android:scaleType="fitCenter"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/exit"
+            android:text="@string/download"
             android:textSize="13dp"
             android:layout_gravity="center_horizontal"
             app:layout_marginTopPercent="10%h"/>
@@ -154,6 +154,41 @@
     </com.zhy.android.percent.support.PercentLinearLayout>
 
 </com.zhy.android.percent.support.PercentLinearLayout>
+
+    <com.zhy.android.percent.support.PercentLinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!--退出-->
+        <com.zhy.android.percent.support.PercentLinearLayout
+            android:id="@+id/menu_exit"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            app:layout_widthPercent="20%w"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_marginTopPercent="15%h"
+                app:layout_widthPercent="60%w"
+                app:layout_heightPercent="35%h"
+                android:layout_gravity="center_horizontal"
+                android:src="@mipmap/exit"
+                android:scaleType="fitCenter"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/exit"
+                android:textSize="13dp"
+                android:layout_gravity="center_horizontal"
+                app:layout_marginTopPercent="10%h"/>
+
+        </com.zhy.android.percent.support.PercentLinearLayout>
+
+    </com.zhy.android.percent.support.PercentLinearLayout>
 
 <RelativeLayout
     android:layout_width="match_parent"

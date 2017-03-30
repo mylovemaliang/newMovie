@@ -16,6 +16,7 @@ import butterknife.Bind;
 import cn.fuyoushuo.commonlib.utils.RxBus;
 import cn.fuyoushuo.domain.entity.BookMark;
 import cn.fuyoushuo.domain.entity.HistoryItem;
+import cn.fuyoushuo.domain.entity.SiteItem;
 import cn.fuyoushuo.domain.entity.UserTrack;
 import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.R;
@@ -183,6 +184,12 @@ public class TabFragment extends BaseFragment{
                                   DownloadDialogFragment.newInstance().show(getFragmentManager(),"DownloadDialogFragment");
                             }
                         });
+            }
+
+            @Override
+            public void onDownload() {
+              //打开下载管理页面
+              DownloadDialogFragment.newInstance().show(getFragmentManager(),"DownloadDialogFragment");
             }
         });
 
@@ -384,6 +391,19 @@ public class TabFragment extends BaseFragment{
                     }
                 },50);
              }
+             else if(busEvent instanceof MainFragment.SiteToContentViewEvent){
+                MainFragment.SiteToContentViewEvent event = (MainFragment.SiteToContentViewEvent) busEvent;
+                SiteItem siteItem = event.getSiteItem();
+                int parentFragmentId = event.getParentFragmentId();
+                if(parentFragmentId != fragmentId) return;
+                final String url = siteItem.getUrl();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                       handCommonToContentEvent(url);
+                    }
+                },50);
+            }
             }
         }));
     }

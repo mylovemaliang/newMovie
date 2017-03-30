@@ -146,7 +146,7 @@ public class SearchDialogFragment extends RxDialogFragment implements ISearchVie
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        resultRview.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayout.VERTICAL));
+        resultRview.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayout.VERTICAL).bindColor(R.color.module_22));
         resultRview.setLayoutManager(layoutManager);
         //resultRview.setNestedScrollingEnabled(true);
         resultRview.setAdapter(searchHisAdapter);
