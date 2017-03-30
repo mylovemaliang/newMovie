@@ -3,22 +3,13 @@ package cn.fuyoushuo.vipmovie.view.activity;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import cn.fuyoushuo.commonlib.utils.RxBus;
-import cn.fuyoushuo.domain.entity.StaticData;
 import cn.fuyoushuo.domain.entity.TabItem;
-import cn.fuyoushuo.vipmovie.GreenDaoManger;
 import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.R;
 import cn.fuyoushuo.vipmovie.ext.AppInfoManger;
@@ -29,6 +20,9 @@ import cn.fuyoushuo.vipmovie.ext.Pair;
 import cn.fuyoushuo.vipmovie.presenter.impl.SessionPresenter;
 import cn.fuyoushuo.vipmovie.view.flagment.SwipeDialogFragment;
 import cn.fuyoushuo.vipmovie.view.flagment.TabFragment;
+import cn.fuyoushuo.vipmovie.view.layout.AppUpdateView;
+import java.util.ArrayList;
+import java.util.List;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
@@ -59,7 +53,16 @@ public class MainActivity extends BaseActivity{
         initFragment();
         initBusEvent();
         initSaveSession();
+        getUpdateInfo(true);
     }
+
+
+    //是否自动检测更新
+    public void getUpdateInfo(boolean b){
+        AppUpdateView updateView = new AppUpdateView(this);
+        updateView.getUpdateInfo(b);
+    }
+
 
     private void initSaveSession(){
         boolean sessionExist = AppInfoManger.getIntance().isSessionExist();
