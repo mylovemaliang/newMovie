@@ -20,6 +20,9 @@ public class Constants {
     public static final String ENDPOINT_WEATHER = " http://api.map.baidu.com";
     public static final String BAIDU_AK = "MPDgj92wUYvRmyaUdQs1XwCf";
 
+    //测试
+    //public static final String ENDPOINT_FQBB_LOCAL = "http://testwww.fanqianbb.com";
+
     public static final String ENDPOINT_FQBB = "http://www.fanqianbb.com";
 
     public static final String ENDPOINT_NEWS="http://newswifiapi.dftoutiao.com";
@@ -33,17 +36,13 @@ public class Constants {
     //test
     public static final String ENDPOINT_VIPKDY="http://180.76.146.164:8085";
 
-    public static final String ENDPOINT_WWW_VIP = "http://180.76.146.164:8085";
-
     //--------------------------------自由解析变量----------------------------------------------------
 
     public static final String FreeResovleUrl = "http://c.vipkdy.com/q2.htm?";
 
+    public static final String CloudResovleUrl = "http://www.vipkdy.com/vc/wi.htm";
 
-
-    //测试
-    //public static final String ENDPOINT_FQBB_LOCAL = "http://testwww.fanqianbb.com";
-
+    public static final String CookieGetUrl = "http://180.76.146.164:8085/va/sc.htm";
 
 
     public static final boolean DEBUG = false;

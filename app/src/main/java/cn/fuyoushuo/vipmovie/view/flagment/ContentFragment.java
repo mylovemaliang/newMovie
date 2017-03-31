@@ -53,6 +53,7 @@ import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.R;
 import cn.fuyoushuo.vipmovie.ext.AppInfoManger;
 import cn.fuyoushuo.vipmovie.ext.DownloadManger;
+import cn.fuyoushuo.vipmovie.ext.LocalFragmentManger;
 import cn.fuyoushuo.vipmovie.po.LoadItem;
 import cn.fuyoushuo.vipmovie.presenter.impl.ContentPresenter;
 import cn.fuyoushuo.vipmovie.presenter.impl.SearchPresenter;
@@ -203,49 +204,22 @@ public class ContentFragment extends BaseFragment {
             webSetting.setSavePassword(false);
         }
 
-        webView.registerHandler("getSession", new BridgeHandler() {
-            @Override
-            public void handler(String data, CallBackFunction function) {
-                String sessionFromLocal = sessionPresenter.getSessionFromLocal();
-                function.onCallBack(sessionFromLocal);
-            }
-        });
-
         webView.registerHandler("vipkdyGetDataFormJavaScript", new BridgeHandler() {
             @Override
             public void handler(String data, final CallBackFunction function) {
                  if(TextUtils.isEmpty(data)) return;
                  JSONObject jsonObject = JSONObject.parseObject(data);
-                 String url = jsonObject.getString("url");
-                 if(TextUtils.isEmpty(url)) return;
-                 sessionPresenter.getDataFromJs(url, new SessionPresenter.DataGetCallback() {
+                 Integer action = jsonObject.getInteger("action");
+                 String params = jsonObject.getString("params");
+                 if(action == null || TextUtils.isEmpty(params)) return;
+                 sessionPresenter.getDataFromJs(action,params,new SessionPresenter.DataGetCallback() {
                      @Override
                      public void onGetData(String result, boolean isOk) {
-                           if(isOk){
-                               function.onCallBack(result);
-                           }
-                     }
-                 });
-            }
-        });
-
-        webView.registerHandler("getFreeResolveData", new BridgeHandler() {
-            @Override
-            public void handler(String data, final CallBackFunction function) {
-               if(TextUtils.isEmpty(data)) return;
-               JSONObject jsonObject = JSONObject.parseObject(data);
-               String input = jsonObject.getString("url");
-               if(TextUtils.isEmpty(input)) return;
-               sessionPresenter.getDataFromFreeResolve(input, new SessionPresenter.FreeResolveCallback() {
-                   @Override
-                   public void onGetFreeResolve(String result, boolean isOk) {
                          if(isOk){
                              function.onCallBack(result);
-                         }else{
-                             function.onCallBack("");
                          }
-                   }
-               });
+                     }
+                 });
             }
         });
 
@@ -305,6 +279,7 @@ public class ContentFragment extends BaseFragment {
                 super.onReceivedTitle(view, title);
                 headText.setText(title);
                 currentPageTitle = title;
+                LocalFragmentManger.getIntance().setTitle(parentFragmentId,title);
                 if(currentHisId != null && loadType == 2 && isTitleSet == false){
                    SearchPresenter.updateHistoryTitle(currentHisId,title);
                    isTitleSet = true;

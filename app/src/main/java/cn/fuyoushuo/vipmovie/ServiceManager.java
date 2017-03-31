@@ -1,8 +1,6 @@
 package cn.fuyoushuo.vipmovie;
 
 import android.content.Context;
-import android.text.TextUtils;
-import android.util.Log;
 
 import com.github.lazylibrary.util.NetWorkUtils;
 import com.google.gson.GsonBuilder;
@@ -18,10 +16,8 @@ import cn.fuyoushuo.domain.httpservice.BaiduHttpService;
 import cn.fuyoushuo.domain.httpservice.FqbbHttpService;
 import cn.fuyoushuo.domain.httpservice.NewsHttpService;
 import cn.fuyoushuo.domain.httpservice.VipkdyHttpService;
-import cn.fuyoushuo.domain.httpservice.VipwwwHttpService;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
-import okhttp3.Connection;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -119,9 +115,6 @@ public class ServiceManager {
         }
         if(t.getName().equals(VipkdyHttpService.class.getName())){
             endPoint = Constants.ENDPOINT_VIPKDY;
-        }
-        if(t.getName().equals(VipwwwHttpService.class.getName())){
-            endPoint = Constants.ENDPOINT_WWW_VIP;
         }
         if ("".equals(endPoint)) {
             throw new IllegalArgumentException("Error: Can't get end point url. Please configure at the method " + ServiceManager.class.getSimpleName() + ".getEndPoint(T t)");

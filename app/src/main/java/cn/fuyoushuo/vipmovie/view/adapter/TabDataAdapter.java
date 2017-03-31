@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import cn.fuyoushuo.commonlib.utils.CommonUtils;
 import cn.fuyoushuo.domain.entity.TabItem;
 import cn.fuyoushuo.vipmovie.MyApplication;
 import cn.fuyoushuo.vipmovie.R;
@@ -51,7 +52,7 @@ public class TabDataAdapter extends BaseListAdapter<TabItem> implements SimpleTo
         Integer fragmentId = item.getFragmentId();
         currentHolder.imageView.setImageBitmap(BitmapManger.getIntance().getBitmap(fragmentId));
         if(!TextUtils.isEmpty(title)){
-            currentHolder.titleView.setText(title);
+            currentHolder.titleView.setText(CommonUtils.getShortTitle(title));
         }
         //如果是当前当前页面,就改变head的颜色
         if(LocalFragmentManger.getIntance().getCurrentId() == fragmentId){

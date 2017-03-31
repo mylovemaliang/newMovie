@@ -11,6 +11,8 @@ public class AppInfoManger {
 
     private static String SESSION_KEY = "vip_session_key";
 
+    private static String TOKEY_KEY = "token_key";
+
     private Context context;
 
     private SharedPreferences sharedPreferences;
@@ -44,19 +46,52 @@ public class AppInfoManger {
     }
 
     //保存会话
-    public void saveVipCookieSession(String sessionResult){
+    public void saveVipCookieSession(String sessionId,String token){
         SharedPreferences.Editor edit = sharedPreferences.edit();
-        edit.putString(SESSION_KEY,sessionResult);
+        edit.putString(SESSION_KEY,sessionId);
+        edit.putString(TOKEY_KEY,token);
         edit.commit();
     }
 
     //获得会话
-    public String getVipCookieSession(){
+    public SessionPair getVipCookieSession(){
         String sessionResult = "";
+        String tokenResult = "";
         if(sharedPreferences.contains(SESSION_KEY)){
             sessionResult = sharedPreferences.getString(SESSION_KEY,"");
         }
-        return sessionResult;
+        if(sharedPreferences.contains(TOKEY_KEY)){
+            tokenResult = sharedPreferences.getString(TOKEY_KEY,"");
+        }
+        return new SessionPair(sessionResult,tokenResult);
+    }
+
+    public static class SessionPair{
+
+        private String sessionId;
+
+        private String token;
+
+        public SessionPair(String sessionId, String token) {
+            this.sessionId = sessionId;
+            this.token = token;
+        }
+
+        public String getSessionId() {
+            return sessionId;
+        }
+
+        public void setSessionId(String sessionId) {
+            this.sessionId = sessionId;
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public void setToken(String token) {
+            this.token = token;
+        }
     }
 
 }

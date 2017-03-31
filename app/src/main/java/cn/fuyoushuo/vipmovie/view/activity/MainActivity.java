@@ -70,8 +70,10 @@ public class MainActivity extends BaseActivity{
             sessionPresenter.getSessionForCookie(new SessionPresenter.SessionGetCallback() {
 
                 @Override
-                public void onGetSession(String sessionResult, boolean isOk) {
-                    AppInfoManger.getIntance().saveVipCookieSession(sessionResult);
+                public void onGetSession(String sessionId, String token, boolean isOk) {
+                    if(isOk){
+                      AppInfoManger.getIntance().saveVipCookieSession(sessionId,token);
+                    }
                 }
             });
         }

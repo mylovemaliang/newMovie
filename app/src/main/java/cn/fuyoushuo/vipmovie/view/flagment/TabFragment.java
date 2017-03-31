@@ -175,13 +175,12 @@ public class TabFragment extends BaseFragment{
             public void onExit() {
                 //关闭应用
                 Toast.makeText(MyApplication.getContext(),"应用马上就要关闭了",Toast.LENGTH_SHORT).show();
-                Observable.timer(3,TimeUnit.SECONDS)
+                Observable.timer(2,TimeUnit.SECONDS)
                         .subscribe(new Action1<Long>() {
                             @Override
                             public void call(Long aLong) {
-//                                MyApplication.getMyapplication().finishAllActivity();
-//                                MyApplication.getMyapplication().finishProgram();
-                                  DownloadDialogFragment.newInstance().show(getFragmentManager(),"DownloadDialogFragment");
+                                MyApplication.getMyapplication().finishAllActivity();
+                                MyApplication.getMyapplication().finishProgram();
                             }
                         });
             }
@@ -314,6 +313,10 @@ public class TabFragment extends BaseFragment{
             mContent = to;
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.addToBackStack(null);
+            if(to == contentFragment){
+                //标题修改
+                LocalFragmentManger.getIntance().setTitle(fragmentId,"首页");
+            }
             if (!to.isAdded()) {    // 先判断是否被add过
                 transaction.hide(from).add(R.id.tab_fragment_area,to).commitAllowingStateLoss();
                 // 隐藏当前的fragment，add下一个到Activity中
